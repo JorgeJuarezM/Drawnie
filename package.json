@@ -4,7 +4,10 @@
   "version": "0.1.0",
   "description": "Pizarra infinita para crear diagramas bonitos, con soporte para lápiz.",
   "main": "main.js",
-  "author": "Drawnie",
+  "author": {
+    "name": "Jorge Juarez",
+    "email": "contacto@jorgejuarez.net"
+  },
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
@@ -17,6 +20,7 @@
   "build": {
     "appId": "com.drawnie.app",
     "productName": "Drawnie",
+    "copyright": "© 2026 Jorge Juarez",
     "directories": {
       "output": "dist",
       "buildResources": "build"

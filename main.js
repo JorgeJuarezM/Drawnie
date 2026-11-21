@@ -24,6 +24,9 @@ const { app, BrowserWindow, Menu, dialog, ipcMain, nativeTheme, shell, clipboard
 const path = require('node:path');
 const fs = require('node:fs/promises');
 
+const AUTHOR = { name: 'Jorge Juarez', email: 'contacto@jorgejuarez.net' };
+const COPYRIGHT = `© ${new Date().getFullYear()} ${AUTHOR.name}`;
+
 const isMac = process.platform === 'darwin';
 const FILE_FILTERS = [{ name: 'Pizarra de Drawnie', extensions: ['drawnie'] }];
 
@@ -142,6 +145,27 @@ async function promptOpen() {
   if (!result.canceled && result.filePaths[0]) openFile(result.filePaths[0], win);
 }
 
+function showAbout() {
+  if (isMac) return app.showAboutPanel();
+  const win = focusedWin();
+  const opts = {
+    type: 'info',
+    title: 'Acerca de Drawnie',
+    message: `Drawnie ${app.getVersion()}`,
+    detail: `Pizarra para diagramas sencillos y bonitos.\n\nCreado por ${AUTHOR.name}\n${AUTHOR.email}\n\n${COPYRIGHT}`,
+    buttons: ['Aceptar', 'Escribir al autor'],
+    defaultId: 0,
+    cancelId: 0,
+    noLink: true,
+  };
+  const p = win ? dialog.showMessageBox(win, opts) : dialog.showMessageBox(opts);
+  p.then(({ response }) => { if (response === 1) contactAuthor(); });
+}
+
+function contactAuthor() {
+  shell.openExternal(`mailto:${AUTHOR.email}?subject=${encodeURIComponent('Drawnie')}`);
+}
+
 function buildMenu() {
   const template = [
     ...(isMac
@@ -217,6 +241,14 @@ function buildMenu() {
         { role: 'minimize', label: 'Minimizar' },
         { role: 'zoom', label: 'Zoom' },
         ...(isMac ? [{ type: 'separator' }, { role: 'front', label: 'Traer todo al frente' }] : []),
+      ],
+    },
+    {
+      role: 'help',
+      label: 'Ayuda',
+      submenu: [
+        { label: 'Contactar al autor…', click: contactAuthor },
+        ...(isMac ? [] : [{ type: 'separator' }, { label: 'Acerca de Drawnie', click: showAbout }]),
       ],
     },
   ];
@@ -334,6 +366,14 @@ if (!gotLock) {
 
   app.whenReady().then(() => {
     app.setName('Drawnie');
+    app.setAboutPanelOptions({
+      applicationName: 'Drawnie',
+      applicationVersion: app.getVersion(),
+      version: '',
+      copyright: COPYRIGHT,
+      credits: `Creado por ${AUTHOR.name}\n${AUTHOR.email}`,
+      authors: [AUTHOR.name],
+    });
     buildMenu();
     if (!isMac) {
       const file = process.argv.slice(1).find((a) => a.endsWith('.drawnie'));
