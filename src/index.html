@@ -20,7 +20,7 @@
 
   SPDX-License-Identifier: AGPL-3.0-or-later
 -->
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'" />
@@ -32,21 +32,21 @@
   <header id="titlebar">
     <div class="doc">
       <div class="history-btns">
-        <button id="btn-undo" class="icon-btn" title="Deshacer"></button>
-        <button id="btn-redo" class="icon-btn" title="Rehacer"></button>
+        <button id="btn-undo" class="icon-btn" data-i18n-title="Undo"></button>
+        <button id="btn-redo" class="icon-btn" data-i18n-title="Redo"></button>
       </div>
       <div class="doc-name">
-        <span id="doc-title">Sin título</span>
+        <span id="doc-title"></span>
         <span id="doc-status"></span>
       </div>
     </div>
-    <nav id="toolbar" aria-label="Herramientas"></nav>
+    <nav id="toolbar" data-i18n-aria-label="Tools"></nav>
     <div class="zoom">
-      <button id="zoom-out" class="icon-btn" title="Alejar"></button>
-      <button id="zoom-label" title="Clic: 100% / Ajustar">100%</button>
-      <button id="zoom-in" class="icon-btn" title="Acercar"></button>
+      <button id="zoom-out" class="icon-btn" data-i18n-title="Zoom Out"></button>
+      <button id="zoom-label" data-i18n-title="Click: 100% / Fit">100%</button>
+      <button id="zoom-in" class="icon-btn" data-i18n-title="Zoom In"></button>
       <span class="sep"></span>
-      <button id="theme-toggle" class="icon-btn" title="Cambiar a modo oscuro"></button>
+      <button id="theme-toggle" class="icon-btn"></button>
     </div>
   </header>
 
@@ -63,20 +63,20 @@
     </svg>
     <div id="editor-layer"></div>
     <div id="empty-hint">
-      <h2>Tu pizarra está lista</h2>
-      <p>Elige una forma, escribe con doble clic o dibuja con tu lápiz.</p>
+      <h2 data-i18n="Your board is ready"></h2>
+      <p data-i18n="Pick a shape, double-click to type, or draw with your pen."></p>
       <div class="keys">
-        <span><kbd>R</kbd> Formas</span>
-        <span><kbd>S</kbd> Nota</span>
-        <span><kbd>T</kbd> Texto</span>
-        <span><kbd>A</kbd> Conector</span>
-        <span><kbd>P</kbd> Pluma</span>
-        <span><kbd>Espacio</kbd> Mover</span>
+        <span><kbd>R</kbd> <span data-i18n="Shapes"></span></span>
+        <span><kbd>S</kbd> <span data-i18n="Note"></span></span>
+        <span><kbd>T</kbd> <span data-i18n="Text"></span></span>
+        <span><kbd>A</kbd> <span data-i18n="Connector"></span></span>
+        <span><kbd>P</kbd> <span data-i18n="Pen"></span></span>
+        <span><kbd data-i18n="Space"></kbd> <span data-i18n="Pan"></span></span>
       </div>
     </div>
   </main>
 
-  <aside id="inspector" aria-label="Propiedades"></aside>
+  <aside id="inspector" data-i18n-aria-label="Properties"></aside>
   <div id="toast" role="status"></div>
   <input id="file-input" type="file" accept="image/*" multiple hidden />
 

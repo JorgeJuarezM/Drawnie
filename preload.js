@@ -24,6 +24,9 @@ const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('drawnie', {
   platform: process.platform,
+  // Catálogo de traducciones del idioma activo (se pide de forma síncrona al arrancar).
+  i18n: ipcRenderer.sendSync('i18n:catalog'),
+  onLocaleChange: (handler) => ipcRenderer.on('i18n:changed', (_e, catalog) => handler(catalog)),
   save: (content, { saveAs = false, suggestedName } = {}) =>
     ipcRenderer.invoke('file:save', { content, saveAs, suggestedName }),
   exportFile: (format, data, suggestedName) =>
@@ -34,7 +37,7 @@ contextBridge.exposeInMainWorld('drawnie', {
   readClipboard: () => ipcRenderer.invoke('clipboard:read'),
   writeClipboard: (text) => ipcRenderer.send('clipboard:write', text),
   setTheme: (mode) => ipcRenderer.send('theme:set', mode),
-  setDocState:(state) => ipcRenderer.send('doc:state', state),
+  setDocState: (state) => ipcRenderer.send('doc:state', state),
   confirmClose: () => ipcRenderer.send('win:close-confirmed'),
   onMenu: (handler) => ipcRenderer.on('menu', (_e, command) => handler(command)),
   onFileLoad: (handler) => ipcRenderer.on('file:load', (_e, payload) => handler(payload)),

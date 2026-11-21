@@ -20,6 +20,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 // Colores y medidas predefinidas. Pocas opciones, todas armoniosas.
+import { N_ } from './i18n-core.js';
 
 /** Estilos de forma: relleno, borde y color de texto que combinan entre sí. */
 export const PRESETS = {
@@ -55,14 +56,29 @@ export const FONT_SIZES = [
 ];
 
 export const SHAPE_KINDS = ['rect', 'pill', 'ellipse', 'diamond', 'triangle', 'hexagon', 'cylinder'];
+/** Nombres visibles (msgid en inglés; se traducen al pintar con t()). */
 export const SHAPE_LABELS = {
-  rect: 'Rectángulo',
-  pill: 'Píldora',
-  ellipse: 'Elipse',
-  diamond: 'Rombo',
-  triangle: 'Triángulo',
-  hexagon: 'Hexágono',
-  cylinder: 'Base de datos',
+  rect: N_('Rectangle'),
+  pill: N_('Pill'),
+  ellipse: N_('Ellipse'),
+  diamond: N_('Diamond'),
+  triangle: N_('Triangle'),
+  hexagon: N_('Hexagon'),
+  cylinder: N_('Database'),
+};
+
+export const PRESET_LABELS = {
+  white: N_('White'),
+  gray: N_('Gray'),
+  yellow: N_('Yellow'),
+  orange: N_('Orange'),
+  red: N_('Red'),
+  purple: N_('Purple'),
+  blue: N_('Blue'),
+  teal: N_('Teal'),
+  green: N_('Green'),
+  dark: N_('Dark'),
+  none: N_('No Fill'),
 };
 
 export const DEFAULT_SIZES = {

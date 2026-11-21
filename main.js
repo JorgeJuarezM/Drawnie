@@ -23,12 +23,15 @@
 const { app, BrowserWindow, Menu, dialog, ipcMain, nativeTheme, shell, clipboard } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs/promises');
+const i18n = require('./i18n');
+
+const { t } = i18n;
 
 const AUTHOR = { name: 'Jorge Juarez', email: 'contacto@jorgejuarez.net' };
 const COPYRIGHT = `© ${new Date().getFullYear()} ${AUTHOR.name}`;
 
 const isMac = process.platform === 'darwin';
-const FILE_FILTERS = [{ name: 'Pizarra de Drawnie', extensions: ['drawnie'] }];
+const fileFilters = () => [{ name: t('Drawnie board'), extensions: ['drawnie'] }];
 
 /** Estado por ventana: ruta del archivo y si hay cambios sin guardar. */
 const windowState = new Map();
@@ -80,11 +83,11 @@ function createWindow(filePath = null) {
     event.preventDefault();
     const choice = dialog.showMessageBoxSync(win, {
       type: 'question',
-      buttons: ['Guardar', 'No guardar', 'Cancelar'],
+      buttons: [t('Save'), t("Don't Save"), t('Cancel')],
       defaultId: 0,
       cancelId: 2,
-      message: '¿Quieres guardar los cambios de esta pizarra?',
-      detail: 'Si no guardas, los cambios se perderán.',
+      message: t('Do you want to save the changes to this board?'),
+      detail: t("Your changes will be lost if you don't save them."),
     });
     if (choice === 0) {
       win.webContents.send('menu', 'save-and-close');
@@ -106,7 +109,7 @@ async function openFileInWindow(win, filePath) {
     win.webContents.send('file:load', { filePath, content });
     app.addRecentDocument(filePath);
   } catch (err) {
-    dialog.showErrorBox('No se pudo abrir el archivo', String(err.message || err));
+    dialog.showErrorBox(t('Could not open the file'), String(err.message || err));
   }
 }
 
@@ -140,9 +143,24 @@ async function promptOpen() {
   const win = focusedWin();
   const result = await dialog.showOpenDialog(win, {
     properties: ['openFile'],
-    filters: FILE_FILTERS,
+    filters: fileFilters(),
   });
   if (!result.canceled && result.filePaths[0]) openFile(result.filePaths[0], win);
+}
+
+function aboutCredits() {
+  return t('Created by {name}', { name: AUTHOR.name }) + `\n${AUTHOR.email}`;
+}
+
+function updateAboutPanel() {
+  app.setAboutPanelOptions({
+    applicationName: 'Drawnie',
+    applicationVersion: app.getVersion(),
+    version: '',
+    copyright: COPYRIGHT,
+    credits: aboutCredits(),
+    authors: [AUTHOR.name],
+  });
 }
 
 function showAbout() {
@@ -150,10 +168,10 @@ function showAbout() {
   const win = focusedWin();
   const opts = {
     type: 'info',
-    title: 'Acerca de Drawnie',
+    title: t('About Drawnie'),
     message: `Drawnie ${app.getVersion()}`,
-    detail: `Pizarra para diagramas sencillos y bonitos.\n\nCreado por ${AUTHOR.name}\n${AUTHOR.email}\n\n${COPYRIGHT}`,
-    buttons: ['Aceptar', 'Escribir al autor'],
+    detail: `${t('A whiteboard for simple, beautiful diagrams.')}\n\n${aboutCredits()}\n\n${COPYRIGHT}`,
+    buttons: [t('OK'), t('Email the Author')],
     defaultId: 0,
     cancelId: 0,
     noLink: true,
@@ -166,89 +184,118 @@ function contactAuthor() {
   shell.openExternal(`mailto:${AUTHOR.email}?subject=${encodeURIComponent('Drawnie')}`);
 }
 
+/** Cambia el idioma de toda la app sin recargar las ventanas. */
+function setLanguage(value) {
+  const catalog = i18n.setPreference(value);
+  buildMenu();
+  updateAboutPanel();
+  for (const win of BrowserWindow.getAllWindows()) win.webContents.send('i18n:changed', catalog);
+}
+
+function languageMenu() {
+  const pref = i18n.getPreference();
+  // "Language" se añade en inglés para encontrar el menú aunque no se entienda el idioma actual.
+  const label = i18n.getLocale() === 'en' ? 'Language' : `${t('Language')} (Language)`;
+  return {
+    label,
+    submenu: [
+      { label: t('System Default'), type: 'radio', checked: pref === 'system', click: () => setLanguage('system') },
+      { type: 'separator' },
+      ...i18n.available().map((code) => ({
+        label: i18n.nativeName(code),
+        type: 'radio',
+        checked: pref === code,
+        click: () => setLanguage(code),
+      })),
+    ],
+  };
+}
+
 function buildMenu() {
   const template = [
     ...(isMac
       ? [{
           label: app.name,
           submenu: [
-            { role: 'about', label: 'Acerca de Drawnie' },
+            { role: 'about', label: t('About Drawnie') },
             { type: 'separator' },
-            { role: 'services', label: 'Servicios' },
+            { role: 'services', label: t('Services') },
             { type: 'separator' },
-            { role: 'hide', label: 'Ocultar Drawnie' },
-            { role: 'hideOthers', label: 'Ocultar otros' },
-            { role: 'unhide', label: 'Mostrar todo' },
+            { role: 'hide', label: t('Hide Drawnie') },
+            { role: 'hideOthers', label: t('Hide Others') },
+            { role: 'unhide', label: t('Show All') },
             { type: 'separator' },
-            { role: 'quit', label: 'Salir de Drawnie' },
+            { role: 'quit', label: t('Quit Drawnie') },
           ],
         }]
       : []),
     {
-      label: 'Archivo',
+      label: t('File'),
       submenu: [
-        { label: 'Nueva pizarra', accelerator: 'CmdOrCtrl+N', click: () => createWindow() },
-        { label: 'Abrir…', accelerator: 'CmdOrCtrl+O', click: promptOpen },
-        ...(isMac ? [{ role: 'recentDocuments', label: 'Abrir recientes', submenu: [{ role: 'clearRecentDocuments', label: 'Borrar menú' }] }] : []),
+        { label: t('New Board'), accelerator: 'CmdOrCtrl+N', click: () => createWindow() },
+        { label: t('Open…'), accelerator: 'CmdOrCtrl+O', click: promptOpen },
+        ...(isMac ? [{ role: 'recentDocuments', label: t('Open Recent'), submenu: [{ role: 'clearRecentDocuments', label: t('Clear Menu') }] }] : []),
         { type: 'separator' },
-        { label: 'Guardar', accelerator: 'CmdOrCtrl+S', click: () => send('save') },
-        { label: 'Guardar como…', accelerator: 'CmdOrCtrl+Shift+S', click: () => send('save-as') },
+        { label: t('Save'), accelerator: 'CmdOrCtrl+S', click: () => send('save') },
+        { label: t('Save As…'), accelerator: 'CmdOrCtrl+Shift+S', click: () => send('save-as') },
         { type: 'separator' },
-        { label: 'Exportar como PNG…', accelerator: 'CmdOrCtrl+Shift+E', click: () => send('export-png') },
-        { label: 'Exportar como SVG…', click: () => send('export-svg') },
+        { label: t('Export as PNG…'), accelerator: 'CmdOrCtrl+Shift+E', click: () => send('export-png') },
+        { label: t('Export as SVG…'), click: () => send('export-svg') },
         { type: 'separator' },
-        isMac ? { role: 'close', label: 'Cerrar ventana' } : { role: 'quit', label: 'Salir' },
+        isMac ? { role: 'close', label: t('Close Window') } : { role: 'quit', label: t('Exit') },
       ],
     },
     {
-      label: 'Edición',
+      label: t('Edit'),
       submenu: [
-        { label: 'Deshacer', accelerator: 'CmdOrCtrl+Z', click: () => send('undo') },
-        { label: 'Rehacer', accelerator: isMac ? 'Cmd+Shift+Z' : 'Ctrl+Y', click: () => send('redo') },
+        { label: t('Undo'), accelerator: 'CmdOrCtrl+Z', click: () => send('undo') },
+        { label: t('Redo'), accelerator: isMac ? 'Cmd+Shift+Z' : 'Ctrl+Y', click: () => send('redo') },
         { type: 'separator' },
-        { label: 'Cortar', accelerator: 'CmdOrCtrl+X', click: () => send('cut') },
-        { label: 'Copiar', accelerator: 'CmdOrCtrl+C', click: () => send('copy') },
-        { label: 'Pegar', accelerator: 'CmdOrCtrl+V', click: () => send('paste') },
-        { label: 'Duplicar', accelerator: 'CmdOrCtrl+D', click: () => send('duplicate') },
-        { label: 'Eliminar', click: () => send('delete') },
+        { label: t('Cut'), accelerator: 'CmdOrCtrl+X', click: () => send('cut') },
+        { label: t('Copy'), accelerator: 'CmdOrCtrl+C', click: () => send('copy') },
+        { label: t('Paste'), accelerator: 'CmdOrCtrl+V', click: () => send('paste') },
+        { label: t('Duplicate'), accelerator: 'CmdOrCtrl+D', click: () => send('duplicate') },
+        { label: t('Delete'), click: () => send('delete') },
         { type: 'separator' },
-        { label: 'Seleccionar todo', accelerator: 'CmdOrCtrl+A', click: () => send('select-all') },
+        { label: t('Select All'), accelerator: 'CmdOrCtrl+A', click: () => send('select-all') },
         { type: 'separator' },
-        { label: 'Traer al frente', accelerator: 'CmdOrCtrl+Shift+]', click: () => send('bring-front') },
-        { label: 'Traer adelante', accelerator: 'CmdOrCtrl+]', click: () => send('bring-forward') },
-        { label: 'Enviar atrás', accelerator: 'CmdOrCtrl+[', click: () => send('send-backward') },
-        { label: 'Enviar al fondo', accelerator: 'CmdOrCtrl+Shift+[', click: () => send('send-back') },
+        { label: t('Bring to Front'), accelerator: 'CmdOrCtrl+Shift+]', click: () => send('bring-front') },
+        { label: t('Bring Forward'), accelerator: 'CmdOrCtrl+]', click: () => send('bring-forward') },
+        { label: t('Send Backward'), accelerator: 'CmdOrCtrl+[', click: () => send('send-backward') },
+        { label: t('Send to Back'), accelerator: 'CmdOrCtrl+Shift+[', click: () => send('send-back') },
       ],
     },
     {
-      label: 'Visualización',
+      label: t('View'),
       submenu: [
-        { label: 'Acercar', accelerator: 'CmdOrCtrl+=', click: () => send('zoom-in') },
-        { label: 'Alejar', accelerator: 'CmdOrCtrl+-', click: () => send('zoom-out') },
-        { label: 'Tamaño real', accelerator: 'CmdOrCtrl+0', click: () => send('zoom-reset') },
-        { label: 'Ajustar al contenido', accelerator: 'CmdOrCtrl+1', click: () => send('zoom-fit') },
+        { label: t('Zoom In'), accelerator: 'CmdOrCtrl+=', click: () => send('zoom-in') },
+        { label: t('Zoom Out'), accelerator: 'CmdOrCtrl+-', click: () => send('zoom-out') },
+        { label: t('Actual Size'), accelerator: 'CmdOrCtrl+0', click: () => send('zoom-reset') },
+        { label: t('Zoom to Fit'), accelerator: 'CmdOrCtrl+1', click: () => send('zoom-fit') },
         { type: 'separator' },
-        { label: 'Mostrar cuadrícula', accelerator: "CmdOrCtrl+'", click: () => send('toggle-grid') },
-        { label: 'El lápiz siempre dibuja', click: () => send('toggle-pen-autodraw') },
+        { label: t('Show Grid'), accelerator: "CmdOrCtrl+'", click: () => send('toggle-grid') },
+        { label: t('Pen Always Draws'), click: () => send('toggle-pen-autodraw') },
         { type: 'separator' },
-        { role: 'togglefullscreen', label: 'Pantalla completa' },
-        { role: 'toggleDevTools', label: 'Herramientas de desarrollo' },
+        languageMenu(),
+        { type: 'separator' },
+        { role: 'togglefullscreen', label: t('Toggle Full Screen') },
+        { role: 'toggleDevTools', label: t('Developer Tools') },
       ],
     },
     {
-      label: 'Ventana',
+      label: t('Window'),
       submenu: [
-        { role: 'minimize', label: 'Minimizar' },
-        { role: 'zoom', label: 'Zoom' },
-        ...(isMac ? [{ type: 'separator' }, { role: 'front', label: 'Traer todo al frente' }] : []),
+        { role: 'minimize', label: t('Minimize') },
+        { role: 'zoom', label: t('Zoom') },
+        ...(isMac ? [{ type: 'separator' }, { role: 'front', label: t('Bring All to Front') }] : []),
       ],
     },
     {
       role: 'help',
-      label: 'Ayuda',
+      label: t('Help'),
       submenu: [
-        { label: 'Contactar al autor…', click: contactAuthor },
-        ...(isMac ? [] : [{ type: 'separator' }, { label: 'Acerca de Drawnie', click: showAbout }]),
+        { label: t('Contact the Author…'), click: contactAuthor },
+        ...(isMac ? [] : [{ type: 'separator' }, { label: t('About Drawnie'), click: showAbout }]),
       ],
     },
   ];
@@ -263,8 +310,8 @@ ipcMain.handle('file:save', async (event, { content, saveAs, suggestedName }) =>
   let filePath = state?.filePath;
   if (!filePath || saveAs) {
     const result = await dialog.showSaveDialog(win, {
-      defaultPath: filePath || `${suggestedName || 'Pizarra'}.drawnie`,
-      filters: FILE_FILTERS,
+      defaultPath: filePath || `${suggestedName || t('Board')}.drawnie`,
+      filters: fileFilters(),
     });
     if (result.canceled || !result.filePath) return null;
     filePath = result.filePath;
@@ -278,7 +325,7 @@ ipcMain.handle('file:save', async (event, { content, saveAs, suggestedName }) =>
 ipcMain.handle('file:export', async (event, { format, data, suggestedName }) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   const result = await dialog.showSaveDialog(win, {
-    defaultPath: `${suggestedName || 'Pizarra'}.${format}`,
+    defaultPath: `${suggestedName || t('Board')}.${format}`,
     filters: [{ name: format.toUpperCase(), extensions: [format] }],
   });
   if (result.canceled || !result.filePath) return null;
@@ -308,6 +355,11 @@ ipcMain.on('win:close-confirmed', (event) => {
 });
 
 ipcMain.on('app:open', () => promptOpen());
+
+// Traducciones para la interfaz (síncrono: se necesitan antes de pintar).
+ipcMain.on('i18n:catalog', (event) => {
+  event.returnValue = i18n.getCatalog();
+});
 
 // Tema elegido desde la interfaz: afecta a todas las ventanas.
 ipcMain.on('theme:set', (_event, mode) => {
@@ -364,16 +416,10 @@ if (!gotLock) {
     }
   });
 
-  app.whenReady().then(() => {
+  app.whenReady().then(async () => {
     app.setName('Drawnie');
-    app.setAboutPanelOptions({
-      applicationName: 'Drawnie',
-      applicationVersion: app.getVersion(),
-      version: '',
-      copyright: COPYRIGHT,
-      credits: `Creado por ${AUTHOR.name}\n${AUTHOR.email}`,
-      authors: [AUTHOR.name],
-    });
+    await i18n.init();
+    updateAboutPanel();
     buildMenu();
     if (!isMac) {
       const file = process.argv.slice(1).find((a) => a.endsWith('.drawnie'));

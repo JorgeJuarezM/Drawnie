@@ -1,0 +1,553 @@
+# Plantilla de traducciones de Drawnie. Generada con: npm run i18n
+# No la edites a mano; crea o actualiza los .po.
+msgid ""
+msgstr ""
+"Project-Id-Version: Drawnie 0.1.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: main.js:34
+msgid "Drawnie board"
+msgstr ""
+
+#: main.js:86 main.js:239
+msgid "Save"
+msgstr ""
+
+#: main.js:86
+msgid "Don't Save"
+msgstr ""
+
+#: main.js:86
+msgid "Cancel"
+msgstr ""
+
+#: main.js:89
+msgid "Do you want to save the changes to this board?"
+msgstr ""
+
+#: main.js:90
+msgid "Your changes will be lost if you don't save them."
+msgstr ""
+
+#: main.js:112
+msgid "Could not open the file"
+msgstr ""
+
+#: main.js:152
+msgid "Created by {name}"
+msgstr ""
+
+#: main.js:171 main.js:220 main.js:298
+msgid "About Drawnie"
+msgstr ""
+
+#: main.js:173
+msgid "A whiteboard for simple, beautiful diagrams."
+msgstr ""
+
+#: main.js:174
+msgid "OK"
+msgstr ""
+
+#: main.js:174
+msgid "Email the Author"
+msgstr ""
+
+#: main.js:198
+msgid "Language"
+msgstr ""
+
+#: main.js:202
+msgid "System Default"
+msgstr ""
+
+#: main.js:222
+msgid "Services"
+msgstr ""
+
+#: main.js:224
+msgid "Hide Drawnie"
+msgstr ""
+
+#: main.js:225
+msgid "Hide Others"
+msgstr ""
+
+#: main.js:226
+msgid "Show All"
+msgstr ""
+
+#: main.js:228
+msgid "Quit Drawnie"
+msgstr ""
+
+#: main.js:233
+msgid "File"
+msgstr ""
+
+#: main.js:235
+msgid "New Board"
+msgstr ""
+
+#: main.js:236
+msgid "Open…"
+msgstr ""
+
+#: main.js:237
+msgid "Open Recent"
+msgstr ""
+
+#: main.js:237
+msgid "Clear Menu"
+msgstr ""
+
+#: main.js:240
+msgid "Save As…"
+msgstr ""
+
+#: main.js:242
+msgid "Export as PNG…"
+msgstr ""
+
+#: main.js:243
+msgid "Export as SVG…"
+msgstr ""
+
+#: main.js:245
+msgid "Close Window"
+msgstr ""
+
+#: main.js:245
+msgid "Exit"
+msgstr ""
+
+#: main.js:249
+msgid "Edit"
+msgstr ""
+
+#: main.js:251 src/index.html:35
+msgid "Undo"
+msgstr ""
+
+#: main.js:252 src/index.html:36
+msgid "Redo"
+msgstr ""
+
+#: main.js:254
+msgid "Cut"
+msgstr ""
+
+#: main.js:255
+msgid "Copy"
+msgstr ""
+
+#: main.js:256
+msgid "Paste"
+msgstr ""
+
+#: main.js:257 src/js/app.js:1566
+msgid "Duplicate"
+msgstr ""
+
+#: main.js:258 src/js/app.js:1567
+msgid "Delete"
+msgstr ""
+
+#: main.js:260
+msgid "Select All"
+msgstr ""
+
+#: main.js:262 src/js/app.js:1564
+msgid "Bring to Front"
+msgstr ""
+
+#: main.js:263
+msgid "Bring Forward"
+msgstr ""
+
+#: main.js:264
+msgid "Send Backward"
+msgstr ""
+
+#: main.js:265 src/js/app.js:1565
+msgid "Send to Back"
+msgstr ""
+
+#: main.js:269
+msgid "View"
+msgstr ""
+
+#: main.js:271 src/index.html:47
+msgid "Zoom In"
+msgstr ""
+
+#: main.js:272 src/index.html:45
+msgid "Zoom Out"
+msgstr ""
+
+#: main.js:273
+msgid "Actual Size"
+msgstr ""
+
+#: main.js:274
+msgid "Zoom to Fit"
+msgstr ""
+
+#: main.js:276
+msgid "Show Grid"
+msgstr ""
+
+#: main.js:277 src/js/app.js:1461
+msgid "Pen Always Draws"
+msgstr ""
+
+#: main.js:281
+msgid "Toggle Full Screen"
+msgstr ""
+
+#: main.js:282
+msgid "Developer Tools"
+msgstr ""
+
+#: main.js:286
+msgid "Window"
+msgstr ""
+
+#: main.js:288
+msgid "Minimize"
+msgstr ""
+
+#: main.js:289
+msgid "Zoom"
+msgstr ""
+
+#: main.js:290
+msgid "Bring All to Front"
+msgstr ""
+
+#: main.js:295
+msgid "Help"
+msgstr ""
+
+#: main.js:297
+msgid "Contact the Author…"
+msgstr ""
+
+#: main.js:313 main.js:328
+msgid "Board"
+msgstr ""
+
+#: src/js/app.js:76
+msgid "Switch to Light Mode"
+msgstr ""
+
+#: src/js/app.js:76
+msgid "Switch to Dark Mode"
+msgstr ""
+
+#: src/js/app.js:178
+msgid "Untitled"
+msgstr ""
+
+#: src/js/app.js:183
+msgid "Edited"
+msgstr ""
+
+#: src/js/app.js:1212
+msgid "Could not paste"
+msgstr ""
+
+#: src/js/app.js:1292
+msgid "Unsupported image"
+msgstr ""
+
+#: src/js/app.js:1380
+msgid "Select"
+msgstr ""
+
+#: src/js/app.js:1381
+msgid "Pan Canvas"
+msgstr ""
+
+#: src/js/app.js:1383 src/index.html:69
+msgid "Shapes"
+msgstr ""
+
+#: src/js/app.js:1384
+msgid "Sticky Note"
+msgstr ""
+
+#: src/js/app.js:1385 src/js/app.js:1553 src/index.html:71
+msgid "Text"
+msgstr ""
+
+#: src/js/app.js:1386 src/index.html:72
+msgid "Connector"
+msgstr ""
+
+#: src/js/app.js:1388 src/index.html:73
+msgid "Pen"
+msgstr ""
+
+#: src/js/app.js:1389
+msgid "Highlighter"
+msgstr ""
+
+#: src/js/app.js:1390
+msgid "Eraser"
+msgstr ""
+
+#: src/js/app.js:1392
+msgid "Insert Image"
+msgstr ""
+
+#: src/js/app.js:1430
+msgid "Curved"
+msgstr ""
+
+#: src/js/app.js:1430
+msgid "Straight"
+msgstr ""
+
+#: src/js/app.js:1430
+msgid "Elbow"
+msgstr ""
+
+#: src/js/app.js:1431
+msgid "No Arrows"
+msgstr ""
+
+#: src/js/app.js:1431
+msgid "Arrow at End"
+msgstr ""
+
+#: src/js/app.js:1431
+msgid "Arrows at Both Ends"
+msgstr ""
+
+#: src/js/app.js:1432
+msgid "The pen always draws"
+msgstr ""
+
+#: src/js/app.js:1433
+msgid "The pen selects in Select mode"
+msgstr ""
+
+#: src/js/app.js:1437
+msgid "Automatic"
+msgstr ""
+
+#: src/js/app.js:1461
+msgid "A digital pen draws even when the Select tool is active"
+msgstr ""
+
+#: src/js/app.js:1516
+msgid "Style"
+msgstr ""
+
+#: src/js/app.js:1522
+msgid "Shape"
+msgstr ""
+
+#: src/js/app.js:1523
+msgid "Border"
+msgstr ""
+
+#: src/js/app.js:1524
+msgid "None"
+msgstr ""
+
+#: src/js/app.js:1524
+msgid "Thin"
+msgstr ""
+
+#: src/js/app.js:1524
+msgid "Thick"
+msgstr ""
+
+#: src/js/app.js:1527
+msgid "Color"
+msgstr ""
+
+#: src/js/app.js:1531
+msgid "Line"
+msgstr ""
+
+#: src/js/app.js:1532 src/js/app.js:1545
+msgid "Stroke"
+msgstr ""
+
+#: src/js/app.js:1535
+msgid "Solid"
+msgstr ""
+
+#: src/js/app.js:1535
+msgid "Dashed"
+msgstr ""
+
+#: src/js/app.js:1536
+msgid "Arrows"
+msgstr ""
+
+#: src/js/app.js:1546
+msgid "Thickness"
+msgstr ""
+
+#: src/js/app.js:1549
+msgid "Text Color"
+msgstr ""
+
+#: src/js/app.js:1556
+msgid "Bold"
+msgstr ""
+
+#: src/js/app.js:1559
+msgid "Align Left"
+msgstr ""
+
+#: src/js/app.js:1560
+msgid "Center"
+msgstr ""
+
+#: src/js/app.js:1561
+msgid "Align Right"
+msgstr ""
+
+#: src/js/app.js:1664
+msgid "Saved"
+msgstr ""
+
+#: src/js/app.js:1667
+msgid "Could not save: {error}"
+msgstr ""
+
+#: src/js/app.js:1679
+msgid "unknown format"
+msgstr ""
+
+#: src/js/app.js:1697
+msgid "Could not open: {error}"
+msgstr ""
+
+#: src/js/app.js:1704
+msgid "Nothing to export"
+msgstr ""
+
+#: src/js/app.js:1712
+msgid "Exported as SVG"
+msgstr ""
+
+#: src/js/app.js:1717
+msgid "Exported as PNG"
+msgstr ""
+
+#: src/js/app.js:1719
+msgid "Could not export: {error}"
+msgstr ""
+
+#: src/js/palette.js:61
+msgid "Rectangle"
+msgstr ""
+
+#: src/js/palette.js:62
+msgid "Pill"
+msgstr ""
+
+#: src/js/palette.js:63
+msgid "Ellipse"
+msgstr ""
+
+#: src/js/palette.js:64
+msgid "Diamond"
+msgstr ""
+
+#: src/js/palette.js:65
+msgid "Triangle"
+msgstr ""
+
+#: src/js/palette.js:66
+msgid "Hexagon"
+msgstr ""
+
+#: src/js/palette.js:67
+msgid "Database"
+msgstr ""
+
+#: src/js/palette.js:71
+msgid "White"
+msgstr ""
+
+#: src/js/palette.js:72
+msgid "Gray"
+msgstr ""
+
+#: src/js/palette.js:73
+msgid "Yellow"
+msgstr ""
+
+#: src/js/palette.js:74
+msgid "Orange"
+msgstr ""
+
+#: src/js/palette.js:75
+msgid "Red"
+msgstr ""
+
+#: src/js/palette.js:76
+msgid "Purple"
+msgstr ""
+
+#: src/js/palette.js:77
+msgid "Blue"
+msgstr ""
+
+#: src/js/palette.js:78
+msgid "Teal"
+msgstr ""
+
+#: src/js/palette.js:79
+msgid "Green"
+msgstr ""
+
+#: src/js/palette.js:80
+msgid "Dark"
+msgstr ""
+
+#: src/js/palette.js:81
+msgid "No Fill"
+msgstr ""
+
+#: src/index.html:43
+msgid "Tools"
+msgstr ""
+
+#: src/index.html:46
+msgid "Click: 100% / Fit"
+msgstr ""
+
+#: src/index.html:66
+msgid "Your board is ready"
+msgstr ""
+
+#: src/index.html:67
+msgid "Pick a shape, double-click to type, or draw with your pen."
+msgstr ""
+
+#: src/index.html:70
+msgid "Note"
+msgstr ""
+
+#: src/index.html:74
+msgid "Space"
+msgstr ""
+
+#: src/index.html:74
+msgid "Pan"
+msgstr ""
+
+#: src/index.html:79
+msgid "Properties"
+msgstr ""

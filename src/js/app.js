@@ -22,7 +22,7 @@
 // Drawnie — lienzo infinito para diagramas y dibujo con lápiz.
 import {
   PRESETS, PRESET_ORDER, STICKY_COLORS, STICKY_TEXT, INK_COLORS, HIGHLIGHTER_COLORS, INK_SIZES,
-  HIGHLIGHTER_SIZES, LINE_WIDTHS, STROKE_WIDTHS, FONT_SIZES, SHAPE_KINDS, SHAPE_LABELS, DEFAULT_SIZES,
+  HIGHLIGHTER_SIZES, LINE_WIDTHS, STROKE_WIDTHS, FONT_SIZES, SHAPE_KINDS, SHAPE_LABELS, PRESET_LABELS, DEFAULT_SIZES,
   resolveColor,
 } from './palette.js';
 import {
@@ -32,6 +32,7 @@ import {
 import { elementSVG, defsMarkup, buildExportSVG } from './render.js';
 import { fitText, FONT_FAMILY, LINE_HEIGHT } from './text.js';
 import { ICONS } from './icons.js';
+import { t, N_, onLocaleChange } from './i18n.js';
 
 const api = window.drawnie;
 const NS = 'http://www.w3.org/2000/svg';
@@ -72,7 +73,7 @@ media.addEventListener('change', () => {
 function updateThemeToggle() {
   const btn = $('#theme-toggle');
   btn.innerHTML = theme.dark ? ICONS.sun : ICONS.moon;
-  btn.title = theme.dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+  btn.title = theme.dark ? t('Switch to Light Mode') : t('Switch to Dark Mode');
 }
 
 $('#theme-toggle').addEventListener('click', () => {
@@ -114,7 +115,7 @@ let assets = {};
 let view = { x: 0, y: 0, zoom: 1 };
 let selection = new Set();
 let tool = 'select';
-let docTitle = 'Sin título';
+let docTitle = null; // null = pizarra sin guardar ("Sin título" en el idioma activo)
 let hasFile = false;
 const history = { undo: [], redo: [], current: '[]', saved: '[]' };
 
@@ -174,13 +175,15 @@ function redo() {
   restore(history.current);
 }
 
+const displayTitle = () => docTitle ?? t('Untitled');
+
 function updateDocState() {
   const dirty = history.current !== history.saved;
-  $('#doc-title').textContent = docTitle;
-  $('#doc-status').textContent = dirty ? 'Editado' : '';
+  $('#doc-title').textContent = displayTitle();
+  $('#doc-status').textContent = dirty ? t('Edited') : '';
   $('#btn-undo').disabled = !history.undo.length;
   $('#btn-redo').disabled = !history.redo.length;
-  api?.setDocState({ dirty, title: docTitle });
+  api?.setDocState({ dirty, title: displayTitle() });
 }
 
 // ---------- Vista ----------
@@ -509,10 +512,10 @@ function onPointerDown(e) {
   if (e.button === 2) return;
 
   try { svg.setPointerCapture(e.pointerId); } catch { /* puntero ya liberado */ }
-  const t = effectiveTool(e);
+  const active = effectiveTool(e);
   const pid = e.pointerId;
 
-  switch (t) {
+  switch (active) {
     case 'pan':
       gesture = { type: 'pan', pid, start: sp, view0: { ...view } };
       stage.classList.add('panning');
@@ -540,7 +543,7 @@ function onPointerDown(e) {
     }
     case 'pen':
     case 'highlighter':
-      startInk(t, e, wp);
+      startInk(active, e, wp);
       break;
     case 'eraser':
       gesture = { type: 'erase', pid, last: wp, erased: false };
@@ -724,9 +727,9 @@ function updateMove(g, wp, sp, e) {
     const th = 6 / view.zoom;
     const snap = (cands, targets) => {
       let best = null;
-      for (const c of cands) for (const t of targets) {
-        const d = t - c;
-        if (Math.abs(d) < th && (!best || Math.abs(d) < Math.abs(best.d))) best = { d, value: t };
+      for (const c of cands) for (const target of targets) {
+        const d = target - c;
+        if (Math.abs(d) < th && (!best || Math.abs(d) < Math.abs(best.d))) best = { d, value: target };
       }
       return best;
     };
@@ -1026,9 +1029,9 @@ svg.addEventListener('dblclick', (e) => {
     startEditing(el.id);
   } else if (!el) {
     const wp = toWorld(screenPt(e));
-    const t = addElement(newText({ x: wp.x, y: wp.y - 22 * LINE_HEIGHT * 0.5 }));
-    selection = new Set([t.id]);
-    startEditing(t.id);
+    const txt = addElement(newText({ x: wp.x, y: wp.y - 22 * LINE_HEIGHT * 0.5 }));
+    selection = new Set([txt.id]);
+    startEditing(txt.id);
   }
 });
 
@@ -1206,15 +1209,15 @@ async function pasteFromClipboard() {
     try {
       pasteCount += 1;
       pasteElements(JSON.parse(text.slice(CLIP_PREFIX.length)), 24 * Math.max(0, pasteCount));
-    } catch { toast('No se pudo pegar'); }
+    } catch { toast(t('Could not paste')); }
     return;
   }
   if (clip.image) return insertImage(clip.image, viewCenterWorld());
   if (!text.trim()) return;
   const c = viewCenterWorld();
-  const t = fitText({ ...newText(c), text: text.slice(0, 5000) });
-  addElement({ ...t, x: c.x - t.w / 2, y: c.y - t.h / 2 });
-  selection = new Set([t.id]);
+  const txt = fitText({ ...newText(c), text: text.slice(0, 5000) });
+  addElement({ ...txt, x: c.x - txt.w / 2, y: c.y - txt.h / 2 });
+  selection = new Set([txt.id]);
   commit();
   render();
 }
@@ -1286,7 +1289,7 @@ function insertImage(dataUrl, at = viewCenterWorld()) {
     commit();
     render();
   };
-  img.onerror = () => toast('Imagen no compatible');
+  img.onerror = () => toast(t('Unsupported image'));
   img.src = dataUrl;
 }
 
@@ -1310,8 +1313,8 @@ stage.addEventListener('drop', (e) => {
 });
 
 // ---------- Teclado ----------
-function isFormField(t) {
-  return t && (t.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName));
+function isFormField(node) {
+  return node && (node.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(node.tagName));
 }
 
 const TOOL_KEYS = { v: 'select', h: 'hand', r: 'shape', o: 'ellipse', s: 'sticky', t: 'text', a: 'connector', l: 'connector', p: 'pen', m: 'highlighter', e: 'eraser' };
@@ -1374,26 +1377,26 @@ window.addEventListener('blur', () => {
 
 // ---------- Barra de herramientas ----------
 const TOOLBAR = [
-  { tool: 'select', icon: 'select', label: 'Seleccionar', key: 'V' },
-  { tool: 'hand', icon: 'hand', label: 'Mover lienzo', key: 'H' },
+  { tool: 'select', icon: 'select', label: N_('Select'), key: 'V' },
+  { tool: 'hand', icon: 'hand', label: N_('Pan Canvas'), key: 'H' },
   'sep',
-  { tool: 'shape', icon: 'shapes', label: 'Formas', key: 'R' },
-  { tool: 'sticky', icon: 'sticky', label: 'Nota adhesiva', key: 'S' },
-  { tool: 'text', icon: 'text', label: 'Texto', key: 'T' },
-  { tool: 'connector', icon: 'connector', label: 'Conector', key: 'A' },
+  { tool: 'shape', icon: 'shapes', label: N_('Shapes'), key: 'R' },
+  { tool: 'sticky', icon: 'sticky', label: N_('Sticky Note'), key: 'S' },
+  { tool: 'text', icon: 'text', label: N_('Text'), key: 'T' },
+  { tool: 'connector', icon: 'connector', label: N_('Connector'), key: 'A' },
   'sep',
-  { tool: 'pen', icon: 'pen', label: 'Pluma', key: 'P' },
-  { tool: 'highlighter', icon: 'highlighter', label: 'Resaltador', key: 'M' },
-  { tool: 'eraser', icon: 'eraser', label: 'Borrador', key: 'E' },
+  { tool: 'pen', icon: 'pen', label: N_('Pen'), key: 'P' },
+  { tool: 'highlighter', icon: 'highlighter', label: N_('Highlighter'), key: 'M' },
+  { tool: 'eraser', icon: 'eraser', label: N_('Eraser'), key: 'E' },
   'sep',
-  { action: 'image', icon: 'image', label: 'Insertar imagen' },
+  { action: 'image', icon: 'image', label: N_('Insert Image') },
 ];
 
 function buildToolbar() {
-  $('#toolbar').innerHTML = TOOLBAR.map((t) =>
-    t === 'sep'
+  $('#toolbar').innerHTML = TOOLBAR.map((item) =>
+    item === 'sep'
       ? '<span class="sep"></span>'
-      : `<button class="tool-btn" ${t.tool ? `data-tool="${t.tool}"` : `data-action="${t.action}"`} title="${t.label}${t.key ? ` (${t.key})` : ''}">${ICONS[t.icon]}</button>`,
+      : `<button class="tool-btn" ${item.tool ? `data-tool="${item.tool}"` : `data-action="${item.action}"`} title="${t(item.label)}${item.key ? ` (${item.key})` : ''}">${ICONS[item.icon]}</button>`,
   ).join('');
   $('#btn-undo').innerHTML = ICONS.undo;
   $('#btn-redo').innerHTML = ICONS.redo;
@@ -1423,9 +1426,15 @@ $('#zoom-out').addEventListener('click', () => zoomCenter(0.8));
 $('#zoom-label').addEventListener('click', () => (Math.abs(view.zoom - 1) < 0.01 ? zoomToFit() : zoomTo(1)));
 
 // ---------- Sub-barra (opciones de la herramienta) ----------
+const LINE_STYLES = ['curve', 'straight', 'elbow'];
+const LINE_STYLE_LABELS = { curve: N_('Curved'), straight: N_('Straight'), elbow: N_('Elbow') };
+const ARROWS = [['none', 'arrowNone', N_('No Arrows')], ['end', 'arrowEnd', N_('Arrow at End')], ['both', 'arrowBoth', N_('Arrows at Both Ends')]];
+const PEN_TOAST_ON = N_('The pen always draws');
+const PEN_TOAST_OFF = N_('The pen selects in Select mode');
+
 function swatch(color, active, action, extra = '') {
   const c = color === 'auto' ? theme.fg : color;
-  return `<button class="swatch${active ? ' active' : ''}" data-action="${action}" data-value="${color}" style="--c:${c}" title="${color === 'auto' ? 'Automático' : color}" ${extra}></button>`;
+  return `<button class="swatch${active ? ' active' : ''}" data-action="${action}" data-value="${color}" style="--c:${c}" title="${color === 'auto' ? t('Automatic') : color}" ${extra}></button>`;
 }
 function sizeDot(size, active, action, max) {
   const d = Math.max(4, Math.min(20, (size / max) * 20));
@@ -1438,7 +1447,7 @@ function iconBtn(icon, active, action, value, title) {
 function renderSubbar() {
   let html = '';
   if (tool === 'shape') {
-    html = SHAPE_KINDS.map((k) => iconBtn(k, settings.shapeKind === k, 'tool-shape', k, SHAPE_LABELS[k])).join('');
+    html = SHAPE_KINDS.map((k) => iconBtn(k, settings.shapeKind === k, 'tool-shape', k, t(SHAPE_LABELS[k]))).join('');
   } else if (tool === 'sticky') {
     html = STICKY_COLORS.map((c) => swatch(c, settings.stickyColor === c, 'tool-sticky')).join('');
   } else if (tool === 'pen' || tool === 'highlighter') {
@@ -1449,13 +1458,12 @@ function renderSubbar() {
       '<span class="sep"></span>' +
       sizes.map((s) => sizeDot(s, st.size === s, 'tool-ink-size', sizes[sizes.length - 1])).join('') +
       '<span class="sep"></span>' +
-      `<button class="chip${settings.penAutoDraw ? ' active' : ''}" data-action="toggle-pen" title="Con el lápiz digital se dibuja aunque esté activa la herramienta de selección">${ICONS.pencilTip}<span>Lápiz siempre dibuja</span></button>`;
+      `<button class="chip${settings.penAutoDraw ? ' active' : ''}" data-action="toggle-pen" title="${t('A digital pen draws even when the Select tool is active')}">${ICONS.pencilTip}<span>${t('Pen Always Draws')}</span></button>`;
   } else if (tool === 'connector') {
     const l = settings.line;
-    html = ['curve', 'straight', 'elbow'].map((s) => iconBtn(s, l.style === s, 'tool-line-style', s, { curve: 'Curva', straight: 'Recta', elbow: 'En ángulo' }[s])).join('') +
+    html = LINE_STYLES.map((s) => iconBtn(s, l.style === s, 'tool-line-style', s, t(LINE_STYLE_LABELS[s]))).join('') +
       '<span class="sep"></span>' +
-      [['none', 'arrowNone', 'Sin flechas'], ['end', 'arrowEnd', 'Flecha al final'], ['both', 'arrowBoth', 'Flechas en ambos extremos']]
-        .map(([v, i, t]) => iconBtn(i, l.arrows === v, 'tool-line-arrows', v, t)).join('') +
+      ARROWS.map(([v, i, label]) => iconBtn(i, l.arrows === v, 'tool-line-arrows', v, t(label))).join('') +
       '<span class="sep"></span>' +
       INK_COLORS.map((c) => swatch(c, l.color === c, 'tool-line-color')).join('');
   }
@@ -1473,7 +1481,7 @@ subbarEl.addEventListener('click', (e) => {
     case 'tool-sticky': settings.stickyColor = v; break;
     case 'tool-ink-color': st.color = v; break;
     case 'tool-ink-size': st.size = Number(v); break;
-    case 'toggle-pen': settings.penAutoDraw = !settings.penAutoDraw; toast(settings.penAutoDraw ? 'El lápiz dibuja siempre' : 'El lápiz selecciona en modo Selección'); break;
+    case 'toggle-pen': settings.penAutoDraw = !settings.penAutoDraw; toast(t(settings.penAutoDraw ? PEN_TOAST_ON : PEN_TOAST_OFF)); break;
     case 'tool-line-style': settings.line.style = v; break;
     case 'tool-line-arrows': settings.line.arrows = v; break;
     case 'tool-line-color': settings.line.color = v; break;
@@ -1505,28 +1513,28 @@ function renderInspector() {
 
   if (shapes.length) {
     const s0 = shapes[0];
-    html += section('Estilo', PRESET_ORDER.map((p) => {
+    html += section(t('Style'), PRESET_ORDER.map((p) => {
       const pr = PRESETS[p];
       const fill = pr.fill === 'none' ? 'transparent' : pr.fill;
       const stroke = resolveColor(pr.stroke, theme);
-      return `<button class="preset${s0.preset === p ? ' active' : ''}" data-action="preset" data-value="${p}" title="${p}" style="--f:${fill};--s:${stroke}"></button>`;
+      return `<button class="preset${s0.preset === p ? ' active' : ''}" data-action="preset" data-value="${p}" title="${t(PRESET_LABELS[p])}" style="--f:${fill};--s:${stroke}"></button>`;
     }).join(''));
-    html += section('Forma', SHAPE_KINDS.map((k) => iconBtn(k, shapes.every((s) => s.shape === k), 'shape-kind', k, SHAPE_LABELS[k])).join(''));
-    html += section('Borde', STROKE_WIDTHS.map((w) =>
-      `<button class="chip small${(s0.strokeWidth ?? 1.5) === w ? ' active' : ''}" data-action="stroke-width" data-value="${w}">${w === 0 ? 'Ninguno' : w < 2 ? 'Fino' : 'Grueso'}</button>`).join(''));
+    html += section(t('Shape'), SHAPE_KINDS.map((k) => iconBtn(k, shapes.every((s) => s.shape === k), 'shape-kind', k, t(SHAPE_LABELS[k]))).join(''));
+    html += section(t('Border'), STROKE_WIDTHS.map((w) =>
+      `<button class="chip small${(s0.strokeWidth ?? 1.5) === w ? ' active' : ''}" data-action="stroke-width" data-value="${w}">${w === 0 ? t('None') : w < 2 ? t('Thin') : t('Thick')}</button>`).join(''));
   }
   if (stickies.length) {
-    html += section('Color', STICKY_COLORS.map((c) => swatch(c, stickies[0].fill === c, 'sticky-color')).join(''));
+    html += section(t('Color'), STICKY_COLORS.map((c) => swatch(c, stickies[0].fill === c, 'sticky-color')).join(''));
   }
   if (conns.length) {
     const c0 = conns[0];
-    html += section('Línea', INK_COLORS.map((c) => swatch(c, c0.color === c, 'line-color')).join(''));
-    html += section('Trazo',
-      ['curve', 'straight', 'elbow'].map((s) => iconBtn(s, (c0.lineStyle || 'curve') === s, 'line-style', s, s)).join('') +
+    html += section(t('Line'), INK_COLORS.map((c) => swatch(c, c0.color === c, 'line-color')).join(''));
+    html += section(t('Stroke'),
+      LINE_STYLES.map((s) => iconBtn(s, (c0.lineStyle || 'curve') === s, 'line-style', s, t(LINE_STYLE_LABELS[s]))).join('') +
       '<span class="sep"></span>' +
-      iconBtn('solid', !c0.dashed, 'line-dash', '0', 'Continua') + iconBtn('dashed', !!c0.dashed, 'line-dash', '1', 'Discontinua'));
-    html += section('Flechas',
-      [['none', 'arrowNone'], ['end', 'arrowEnd'], ['both', 'arrowBoth']].map(([v, i]) => iconBtn(i, (c0.arrows || 'end') === v, 'line-arrows', v, v)).join('') +
+      iconBtn('solid', !c0.dashed, 'line-dash', '0', t('Solid')) + iconBtn('dashed', !!c0.dashed, 'line-dash', '1', t('Dashed')));
+    html += section(t('Arrows'),
+      ARROWS.map(([v, i, label]) => iconBtn(i, (c0.arrows || 'end') === v, 'line-arrows', v, t(label))).join('') +
       '<span class="sep"></span>' +
       LINE_WIDTHS.map((w) => sizeDot(w, c0.width === w, 'line-width', 4)).join(''));
   }
@@ -1534,29 +1542,29 @@ function renderInspector() {
     const i0 = inks[0];
     const colors = i0.kind === 'highlighter' ? HIGHLIGHTER_COLORS : INK_COLORS;
     const sizes = i0.kind === 'highlighter' ? HIGHLIGHTER_SIZES : INK_SIZES;
-    html += section('Trazo', colors.map((c) => swatch(c, i0.color === c, 'ink-color')).join(''));
-    html += section('Grosor', sizes.map((s) => sizeDot(s, i0.size === s, 'ink-size', sizes[sizes.length - 1])).join(''));
+    html += section(t('Stroke'), colors.map((c) => swatch(c, i0.color === c, 'ink-color')).join(''));
+    html += section(t('Thickness'), sizes.map((s) => sizeDot(s, i0.size === s, 'ink-size', sizes[sizes.length - 1])).join(''));
   }
   if (texts.length) {
-    html += section('Color de texto', INK_COLORS.map((c) => swatch(c, texts[0].color === c, 'text-color')).join(''));
+    html += section(t('Text Color'), INK_COLORS.map((c) => swatch(c, texts[0].color === c, 'text-color')).join(''));
   }
   if (textual.length) {
     const t0 = textual[0];
-    html += section('Texto',
+    html += section(t('Text'),
       FONT_SIZES.map((fs) => `<button class="chip small${t0.fontSize === fs.value ? ' active' : ''}" data-action="font-size" data-value="${fs.value}">${fs.label}</button>`).join('') +
       '<span class="sep"></span>' +
-      iconBtn('bold', !!t0.bold, 'bold', '1', 'Negrita') +
+      iconBtn('bold', !!t0.bold, 'bold', '1', t('Bold')) +
       (conns.length === textual.length ? '' :
         '<span class="break"></span>' +
-        iconBtn('alignLeft', (t0.align || '') === 'left', 'align', 'left', 'Izquierda') +
-        iconBtn('alignCenter', (t0.align || 'center') === 'center', 'align', 'center', 'Centro') +
-        iconBtn('alignRight', t0.align === 'right', 'align', 'right', 'Derecha')));
+        iconBtn('alignLeft', (t0.align || '') === 'left', 'align', 'left', t('Align Left')) +
+        iconBtn('alignCenter', (t0.align || 'center') === 'center', 'align', 'center', t('Center')) +
+        iconBtn('alignRight', t0.align === 'right', 'align', 'right', t('Align Right'))));
   }
   html += `<section class="actions">
-    ${iconBtn('front', false, 'order', 'front', 'Traer al frente')}
-    ${iconBtn('back', false, 'order', 'back', 'Enviar al fondo')}
-    ${iconBtn('duplicate', false, 'duplicate', '', 'Duplicar')}
-    ${iconBtn('trash', false, 'delete', '', 'Eliminar')}
+    ${iconBtn('front', false, 'order', 'front', t('Bring to Front'))}
+    ${iconBtn('back', false, 'order', 'back', t('Send to Back'))}
+    ${iconBtn('duplicate', false, 'duplicate', '', t('Duplicate'))}
+    ${iconBtn('trash', false, 'delete', '', t('Delete'))}
   </section>`;
   inspectorEl.innerHTML = html;
 }
@@ -1647,16 +1655,16 @@ async function save(saveAs = false) {
   commitEditing();
   if (!api) return false;
   try {
-    const p = await api.save(serialize(), { saveAs, suggestedName: docTitle });
+    const p = await api.save(serialize(), { saveAs, suggestedName: displayTitle() });
     if (!p) return false;
     hasFile = true;
     docTitle = basename(p);
     history.saved = history.current;
     updateDocState();
-    toast('Guardado');
+    toast(t('Saved'));
     return true;
   } catch (err) {
-    toast(`Error al guardar: ${err.message || err}`);
+    toast(t('Could not save: {error}', { error: err.message || err }));
     return false;
   }
 }
@@ -1668,7 +1676,7 @@ function basename(p) {
 function loadDocument({ filePath, content }) {
   try {
     const data = JSON.parse(content);
-    if (!data || !Array.isArray(data.elements)) throw new Error('formato desconocido');
+    if (!data || !Array.isArray(data.elements)) throw new Error(t('unknown format'));
     if (editing) commitEditing();
     setElements(data.elements.filter((e) => e && e.id && e.type));
     assets = data.assets || {};
@@ -1686,29 +1694,29 @@ function loadDocument({ filePath, content }) {
     } else zoomToFit();
     updateDocState();
   } catch (err) {
-    toast(`No se pudo abrir: ${err.message || err}`);
+    toast(t('Could not open: {error}', { error: err.message || err }));
   }
 }
 
 async function exportImage(format) {
   commitEditing();
   const list = selection.size ? selectedElements() : elements;
-  if (!list.length) return toast('No hay nada que exportar');
+  if (!list.length) return toast(t('Nothing to export'));
   const b = contentBounds(list);
   const pad = 32;
   const bounds = { x: b.x - pad, y: b.y - pad, w: b.w + pad * 2, h: b.h + pad * 2 };
   const svgText = buildExportSVG(list, bounds, { ...renderCtx(), editingId: null }, theme.bg);
   try {
     if (format === 'svg') {
-      const p = await api.exportFile('svg', svgText, docTitle);
-      if (p) toast('Exportado como SVG');
+      const p = await api.exportFile('svg', svgText, displayTitle());
+      if (p) toast(t('Exported as SVG'));
       return;
     }
     const base64 = await svgToPngBase64(svgText, bounds);
-    const p = await api.exportFile('png', base64, docTitle);
-    if (p) toast('Exportado como PNG');
+    const p = await api.exportFile('png', base64, displayTitle());
+    if (p) toast(t('Exported as PNG'));
   } catch (err) {
-    toast(`Error al exportar: ${err.message || err}`);
+    toast(t('Could not export: {error}', { error: err.message || err }));
   }
 }
 
@@ -1732,11 +1740,11 @@ async function svgToPngBase64(svgText, bounds) {
 // ---------- Avisos ----------
 let toastTimer = null;
 function toast(msg) {
-  const t = $('#toast');
-  t.textContent = msg;
-  t.classList.add('visible');
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('visible');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('visible'), 1800);
+  toastTimer = setTimeout(() => el.classList.remove('visible'), 1800);
 }
 
 // ---------- Menú nativo ----------
@@ -1770,13 +1778,24 @@ api?.onMenu((cmd) => {
     case 'toggle-pen-autodraw':
       settings.penAutoDraw = !settings.penAutoDraw;
       saveSettings();
-      toast(settings.penAutoDraw ? 'El lápiz dibuja siempre' : 'El lápiz selecciona en modo Selección');
+      toast(t(settings.penAutoDraw ? PEN_TOAST_ON : PEN_TOAST_OFF));
       render();
       break;
   }
 });
 api?.onFileLoad(loadDocument);
 window.drawnieIsEmpty = () => elements.length === 0 && history.current === history.saved && !hasFile;
+
+// ---------- Idioma ----------
+// Al cambiar de idioma se vuelve a pintar todo lo que tiene texto, sin recargar la ventana.
+onLocaleChange(() => {
+  buildToolbar();
+  updateThemeToggle();
+  lastToolbarKey = '';
+  lastInspectorKey = null;
+  updateDocState();
+  renderNow();
+});
 
 // ---------- Inicio ----------
 buildToolbar();
