@@ -148,8 +148,16 @@ async function promptOpen() {
   if (!result.canceled && result.filePaths[0]) openFile(result.filePaths[0], win);
 }
 
+const LICENSE_URL = 'https://www.gnu.org/licenses/agpl-3.0.html';
+
 function aboutCredits() {
-  return t('Created by {name}', { name: AUTHOR.name }) + `\n${AUTHOR.email}`;
+  return [
+    t('Created by {name}', { name: AUTHOR.name }),
+    AUTHOR.email,
+    '',
+    t('Free software under the GNU AGPL-3.0 license or later.'),
+    t('Provided without any warranty.'),
+  ].join('\n');
 }
 
 function updateAboutPanel() {
@@ -295,6 +303,7 @@ function buildMenu() {
       label: t('Help'),
       submenu: [
         { label: t('Contact the Author…'), click: contactAuthor },
+        { label: t('License (GNU AGPL-3.0)'), click: () => shell.openExternal(LICENSE_URL) },
         ...(isMac ? [] : [{ type: 'separator' }, { label: t('About Drawnie'), click: showAbout }]),
       ],
     },

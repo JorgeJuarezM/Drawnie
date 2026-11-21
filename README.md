@@ -115,3 +115,14 @@ src/js/icons.js    Iconos
 src/js/i18n.js     Traducciones en la interfaz (t, tn, tc, data-i18n)
 src/js/i18n-core.js Lectura de .po, plurales y formato (compartido)
 ```
+
+## Licencia
+
+Copyright (C) 2026 Jorge Juarez.
+
+Drawnie es software libre bajo la licencia [GNU AGPL-3.0](LICENSE) o posterior, con términos adicionales de atribución descritos en [NOTICE](NOTICE):
+
+- Puedes usarlo, estudiarlo, modificarlo y redistribuirlo.
+- Cualquier versión modificada o derivada debe publicarse con la misma licencia y con su código fuente disponible, incluso si se ofrece como servicio en red. No se puede convertir en software cerrado.
+- Debe conservarse el aviso de autoría de Jorge Juarez en el código, en la documentación y en la pantalla "Acerca de".
+- Las versiones modificadas deben indicarlo y no presentarse como el Drawnie original.

@@ -12,7 +12,7 @@ msgstr ""
 msgid "Drawnie board"
 msgstr "Pizarra de Drawnie"
 
-#: main.js:86 main.js:239
+#: main.js:86 main.js:247
 msgid "Save"
 msgstr "Guardar"
 
@@ -36,207 +36,219 @@ msgstr "Si no guardas, los cambios se perderán."
 msgid "Could not open the file"
 msgstr "No se pudo abrir el archivo"
 
-#: main.js:152
+#: main.js:155
 msgid "Created by {name}"
 msgstr "Creado por {name}"
 
-#: main.js:171 main.js:220 main.js:298
+#: main.js:158
+msgid "Free software under the GNU AGPL-3.0 license or later."
+msgstr "Software libre bajo la licencia GNU AGPL-3.0 o posterior."
+
+#: main.js:159
+msgid "Provided without any warranty."
+msgstr "Se ofrece sin ninguna garantía."
+
+#: main.js:179 main.js:228 main.js:307
 msgid "About Drawnie"
 msgstr "Acerca de Drawnie"
 
-#: main.js:173
+#: main.js:181
 msgid "A whiteboard for simple, beautiful diagrams."
 msgstr "Pizarra para diagramas sencillos y bonitos."
 
-#: main.js:174
+#: main.js:182
 msgid "OK"
 msgstr "Aceptar"
 
-#: main.js:174
+#: main.js:182
 msgid "Email the Author"
 msgstr "Escribir al autor"
 
-#: main.js:198
+#: main.js:206
 msgid "Language"
 msgstr "Idioma"
 
-#: main.js:202
+#: main.js:210
 msgid "System Default"
 msgstr "Idioma del sistema"
 
-#: main.js:222
+#: main.js:230
 msgid "Services"
 msgstr "Servicios"
 
-#: main.js:224
+#: main.js:232
 msgid "Hide Drawnie"
 msgstr "Ocultar Drawnie"
 
-#: main.js:225
+#: main.js:233
 msgid "Hide Others"
 msgstr "Ocultar otros"
 
-#: main.js:226
+#: main.js:234
 msgid "Show All"
 msgstr "Mostrar todo"
 
-#: main.js:228
+#: main.js:236
 msgid "Quit Drawnie"
 msgstr "Salir de Drawnie"
 
-#: main.js:233
+#: main.js:241
 msgid "File"
 msgstr "Archivo"
 
-#: main.js:235
+#: main.js:243
 msgid "New Board"
 msgstr "Nueva pizarra"
 
-#: main.js:236
+#: main.js:244
 msgid "Open…"
 msgstr "Abrir…"
 
-#: main.js:237
+#: main.js:245
 msgid "Open Recent"
 msgstr "Abrir recientes"
 
-#: main.js:237
+#: main.js:245
 msgid "Clear Menu"
 msgstr "Borrar menú"
 
-#: main.js:240
+#: main.js:248
 msgid "Save As…"
 msgstr "Guardar como…"
 
-#: main.js:242
+#: main.js:250
 msgid "Export as PNG…"
 msgstr "Exportar como PNG…"
 
-#: main.js:243
+#: main.js:251
 msgid "Export as SVG…"
 msgstr "Exportar como SVG…"
 
-#: main.js:245
+#: main.js:253
 msgid "Close Window"
 msgstr "Cerrar ventana"
 
-#: main.js:245
+#: main.js:253
 msgid "Exit"
 msgstr "Salir"
 
-#: main.js:249
+#: main.js:257
 msgid "Edit"
 msgstr "Edición"
 
-#: main.js:251 src/index.html:35
+#: main.js:259 src/index.html:35
 msgid "Undo"
 msgstr "Deshacer"
 
-#: main.js:252 src/index.html:36
+#: main.js:260 src/index.html:36
 msgid "Redo"
 msgstr "Rehacer"
 
-#: main.js:254
+#: main.js:262
 msgid "Cut"
 msgstr "Cortar"
 
-#: main.js:255
+#: main.js:263
 msgid "Copy"
 msgstr "Copiar"
 
-#: main.js:256
+#: main.js:264
 msgid "Paste"
 msgstr "Pegar"
 
-#: main.js:257 src/js/app.js:1566
+#: main.js:265 src/js/app.js:1566
 msgid "Duplicate"
 msgstr "Duplicar"
 
-#: main.js:258 src/js/app.js:1567
+#: main.js:266 src/js/app.js:1567
 msgid "Delete"
 msgstr "Eliminar"
 
-#: main.js:260
+#: main.js:268
 msgid "Select All"
 msgstr "Seleccionar todo"
 
-#: main.js:262 src/js/app.js:1564
+#: main.js:270 src/js/app.js:1564
 msgid "Bring to Front"
 msgstr "Traer al frente"
 
-#: main.js:263
+#: main.js:271
 msgid "Bring Forward"
 msgstr "Traer adelante"
 
-#: main.js:264
+#: main.js:272
 msgid "Send Backward"
 msgstr "Enviar atrás"
 
-#: main.js:265 src/js/app.js:1565
+#: main.js:273 src/js/app.js:1565
 msgid "Send to Back"
 msgstr "Enviar al fondo"
 
-#: main.js:269
+#: main.js:277
 msgid "View"
 msgstr "Visualización"
 
-#: main.js:271 src/index.html:47
+#: main.js:279 src/index.html:47
 msgid "Zoom In"
 msgstr "Acercar"
 
-#: main.js:272 src/index.html:45
+#: main.js:280 src/index.html:45
 msgid "Zoom Out"
 msgstr "Alejar"
 
-#: main.js:273
+#: main.js:281
 msgid "Actual Size"
 msgstr "Tamaño real"
 
-#: main.js:274
+#: main.js:282
 msgid "Zoom to Fit"
 msgstr "Ajustar al contenido"
 
-#: main.js:276
+#: main.js:284
 msgid "Show Grid"
 msgstr "Mostrar cuadrícula"
 
-#: main.js:277 src/js/app.js:1461
+#: main.js:285 src/js/app.js:1461
 msgid "Pen Always Draws"
 msgstr "El lápiz siempre dibuja"
 
-#: main.js:281
+#: main.js:289
 msgid "Toggle Full Screen"
 msgstr "Pantalla completa"
 
-#: main.js:282
+#: main.js:290
 msgid "Developer Tools"
 msgstr "Herramientas de desarrollo"
 
-#: main.js:286
+#: main.js:294
 msgid "Window"
 msgstr "Ventana"
 
-#: main.js:288
+#: main.js:296
 msgid "Minimize"
 msgstr "Minimizar"
 
-#: main.js:289
+#: main.js:297
 msgid "Zoom"
 msgstr "Zoom"
 
-#: main.js:290
+#: main.js:298
 msgid "Bring All to Front"
 msgstr "Traer todo al frente"
 
-#: main.js:295
+#: main.js:303
 msgid "Help"
 msgstr "Ayuda"
 
-#: main.js:297
+#: main.js:305
 msgid "Contact the Author…"
 msgstr "Contactar al autor…"
 
-#: main.js:313 main.js:328
+#: main.js:306
+msgid "License (GNU AGPL-3.0)"
+msgstr "Licencia (GNU AGPL-3.0)"
+
+#: main.js:322 main.js:337
 msgid "Board"
 msgstr "Pizarra"
 
