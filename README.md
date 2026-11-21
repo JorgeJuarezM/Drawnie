@@ -2,7 +2,7 @@
 
 An infinite whiteboard for simple, beautiful diagrams, inspired by macOS Freeform. Built with Electron and no frameworks: the canvas is plain SVG.
 
-**[Website](https://jorgejuarezm.github.io/Drawnie/)** · **[Download](https://github.com/JorgeJuarezM/Drawnie/releases/latest)**
+**[drawnie.com](https://drawnie.com)** · **[Download](https://github.com/JorgeJuarezM/Drawnie/releases/latest)**
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/board-dark.png">
