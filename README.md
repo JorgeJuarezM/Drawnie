@@ -2,6 +2,32 @@
 
 An infinite whiteboard for simple, beautiful diagrams, inspired by macOS Freeform. Built with Electron and no frameworks: the canvas is plain SVG.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/board-dark.png">
+  <img alt="A product launch flowchart in Drawnie with shapes, connectors, sticky notes and pen annotations" src="docs/screenshots/board-light.png">
+</picture>
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img alt="Inspector with style, shape, border and text options for the selected shape" src="docs/screenshots/inspector.png"></td>
+    <td width="50%"><img alt="Connector selected, with line color, stroke style, arrows and width options" src="docs/screenshots/connector.png"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Inspector</b>: styles, shapes, borders and text, with quick-connect handles around the selection.</td>
+    <td align="center"><b>Connectors</b>: curved, straight or elbow lines that follow their shapes, with labels and arrows.</td>
+  </tr>
+  <tr>
+    <td width="50%"><img alt="Pen tool in dark mode with color, size and pen always draws options" src="docs/screenshots/pen-dark.png"></td>
+    <td width="50%"><img alt="The same board in dark mode" src="docs/screenshots/board-dark.png"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Pen and highlighter</b>: pressure-sensitive ink, with palm rejection on pen devices.</td>
+    <td align="center"><b>Dark mode</b>: follows the system, or toggle it from the top-right corner.</td>
+  </tr>
+</table>
+
 ## Features
 
 - **Infinite canvas** with a dot grid, panning (wheel, trackpad, Space + drag, two fingers) and zoom (pinch, ⌘/Ctrl + wheel).
