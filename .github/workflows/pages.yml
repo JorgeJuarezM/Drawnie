@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Publishes the website in site/ to GitHub Pages.
-# The app icon and the README screenshots are copied in at build time.
+# The README screenshots are copied in at build time.
 
 name: Website
 
@@ -13,7 +13,6 @@ on:
     paths:
       - 'site/**'
       - 'docs/screenshots/**'
-      - 'build/icon.png'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -41,7 +40,6 @@ jobs:
           mkdir -p _site
           cp -R site/. _site/
           mkdir -p _site/assets
-          cp build/icon.png _site/assets/icon.png
           cp docs/screenshots/*.png _site/assets/
 
       - uses: actions/configure-pages@v5

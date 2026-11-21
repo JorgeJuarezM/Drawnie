@@ -95,13 +95,13 @@ The installers are currently unsigned. To sign them, add the certificates as rep
 
 ### Website
 
-The website lives in [`site/`](site/) (plain HTML, CSS and JavaScript, styled like the app). The [`.github/workflows/pages.yml`](.github/workflows/pages.yml) workflow publishes it to GitHub Pages whenever `site/`, the screenshots or the icon change on `main`, copying `build/icon.png` and `docs/screenshots/` into it. Download links are read from the latest GitHub Release, so the page never needs updating for a new version.
+The website lives in [`site/`](site/) (plain HTML, CSS and JavaScript, styled like the app). The [`.github/workflows/pages.yml`](.github/workflows/pages.yml) workflow publishes it to GitHub Pages whenever `site/` or the screenshots change on `main`, copying `docs/screenshots/` into it. The icons in `site/img/` are resized copies of `build/icon.png`; regenerate them if the icon changes. Download links are read from the latest GitHub Release, so the page never needs updating for a new version.
 
 To preview it locally:
 
 ```bash
 mkdir -p /tmp/drawnie-site && cp -R site/. /tmp/drawnie-site/ && mkdir -p /tmp/drawnie-site/assets \
-  && cp build/icon.png docs/screenshots/*.png /tmp/drawnie-site/assets/ \
+  && cp docs/screenshots/*.png /tmp/drawnie-site/assets/ \
   && python3 -m http.server 8000 --directory /tmp/drawnie-site
 ```
 

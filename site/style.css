@@ -170,6 +170,18 @@ main { overflow-x: clip; }
   padding: 84px 24px 40px;
   text-align: center;
 }
+.hero-icon {
+  width: 128px;
+  height: 128px;
+  margin: 0 auto 26px;
+  filter: drop-shadow(0 14px 24px rgba(90, 46, 18, 0.28));
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-8px) rotate(2deg); }
+}
+
 h1 {
   margin: 0 auto;
   max-width: 900px;
@@ -194,7 +206,7 @@ h1 {
 }
 .ink-underline { left: 0; right: 0; bottom: -0.12em; width: 100%; height: 0.28em; stroke: var(--ink-blue); stroke-width: 7; }
 .ink-underline path { animation-delay: 0.35s; }
-.ink-loop { left: -12%; top: -18%; width: 124%; height: 136%; stroke: var(--ink-red); stroke-width: 4.5; }
+.ink-loop { left: -10%; top: -4%; width: 120%; height: 118%; stroke: var(--ink-red); stroke-width: 4.5; }
 .ink-loop path { animation-delay: 0.9s; animation-duration: 1.2s; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 
@@ -404,7 +416,8 @@ h2 {
   body { font-size: 16px; }
   .nav-link { display: none; }
   .nav-link[href='#download'] { display: block; }
-  .hero { padding-top: 56px; }
+  .hero { padding-top: 48px; }
+  .hero-icon { width: 96px; height: 96px; margin-bottom: 20px; }
   .features, .downloads { grid-template-columns: 1fr; }
   .section { padding-top: 64px; }
   .window { margin-top: 40px; border-radius: 12px; }
@@ -415,4 +428,5 @@ h2 {
   html { scroll-behavior: auto; }
   .ink path { animation: none; stroke-dashoffset: 0; }
   .btn, .card, .dl { transition: none; }
+  .hero-icon { animation: none; }
 }
