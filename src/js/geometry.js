@@ -19,7 +19,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Geometría: marcos, anclajes de conectores y trazado de líneas.
+// Geometry: frames, connector anchors and line routing.
 
 export const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 export const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -36,13 +36,13 @@ export function isBoxElement(el) {
   return el && (el.type === 'shape' || el.type === 'text' || el.type === 'image');
 }
 
-/** Marco lógico de un elemento (el que se usa para mover y redimensionar). */
+/** Logical frame of an element (the one used to move and resize it). */
 export function frameOf(el, lookup) {
   if (el.type === 'connector') return connectorGeometry(el, lookup).bounds;
   return { x: el.x, y: el.y, w: el.w, h: el.h };
 }
 
-/** Área visible del elemento (incluye el grosor del trazo). */
+/** Visible area of the element (includes the stroke width). */
 export function hitBoundsOf(el, lookup) {
   if (el.type === 'ink') {
     const p = el.size / 2 + 2;
@@ -81,7 +81,7 @@ export function distToSegment(p, a, b) {
   return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
 }
 
-/** Zona interior donde se escribe el texto de una forma (coordenadas locales). */
+/** Inner area where a shape's text is written (local coordinates). */
 export function textBox(el) {
   const { w, h } = el;
   switch (el.shape) {
@@ -108,7 +108,7 @@ export function textBox(el) {
 
 export const cylinderRy = (el) => Math.min(el.h * 0.14, el.w * 0.2, 18);
 
-// ---------- Conectores ----------
+// ---------- Connectors ----------
 
 function chooseSide(s, p) {
   const cx = s.x + s.w / 2, cy = s.y + s.h / 2;
@@ -210,7 +210,7 @@ function polylineMid(pts) {
   return pts[0];
 }
 
-/** Calcula todo lo necesario para dibujar un conector. */
+/** Computes everything needed to draw a connector. */
 export function connectorGeometry(el, lookup) {
   const a = resolveEnd(el.from, el.to, lookup);
   const b = resolveEnd(el.to, el.from, lookup);

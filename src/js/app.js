@@ -19,7 +19,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Drawnie — lienzo infinito para diagramas y dibujo con lápiz.
+// Drawnie — infinite canvas for diagrams and pen drawing.
 import {
   PRESETS, PRESET_ORDER, STICKY_COLORS, STICKY_TEXT, INK_COLORS, HIGHLIGHTER_COLORS, INK_SIZES,
   HIGHLIGHTER_SIZES, LINE_WIDTHS, STROKE_WIDTHS, FONT_SIZES, SHAPE_KINDS, SHAPE_LABELS, PRESET_LABELS, DEFAULT_SIZES,
@@ -56,7 +56,7 @@ const inspectorEl = $('#inspector');
 const subbarEl = $('#subbar');
 $('#defs').innerHTML = defsMarkup();
 
-// ---------- Tema ----------
+// ---------- Theme ----------
 const media = matchMedia('(prefers-color-scheme: dark)');
 const makeTheme = () =>
   media.matches
@@ -82,7 +82,7 @@ $('#theme-toggle').addEventListener('click', () => {
   api?.setTheme(settings.theme);
 });
 
-// ---------- Preferencias ----------
+// ---------- Settings ----------
 const DEFAULT_SETTINGS = {
   grid: true,
   penAutoDraw: true,
@@ -105,17 +105,17 @@ const settings = (() => {
 function saveSettings() {
   try {
     localStorage.setItem('drawnie.settings', JSON.stringify(settings));
-  } catch { /* sin almacenamiento: no pasa nada */ }
+  } catch { /* no storage available: nothing to do */ }
 }
 
-// ---------- Documento ----------
+// ---------- Document ----------
 let elements = [];
 let byId = new Map();
 let assets = {};
 let view = { x: 0, y: 0, zoom: 1 };
 let selection = new Set();
 let tool = 'select';
-let docTitle = null; // null = pizarra sin guardar ("Sin título" en el idioma activo)
+let docTitle = null; // null = unsaved board ("Untitled" in the active language)
 let hasFile = false;
 const history = { undo: [], redo: [], current: '[]', saved: '[]' };
 
@@ -139,7 +139,7 @@ function removeElements(ids) {
   for (const id of ids) selection.delete(id);
 }
 
-// ---------- Historial ----------
+// ---------- History ----------
 const snapshot = () => JSON.stringify(elements);
 
 function commit() {
@@ -186,7 +186,7 @@ function updateDocState() {
   api?.setDocState({ dirty, title: displayTitle() });
 }
 
-// ---------- Vista ----------
+// ---------- View ----------
 function stageRect() {
   return svg.getBoundingClientRect();
 }
@@ -400,7 +400,7 @@ function renderOverlay() {
   overlayEl.innerHTML = s;
 }
 
-// ---------- Fábricas ----------
+// ---------- Factories ----------
 function newShape(kind, frame) {
   if (kind === 'sticky') {
     return {
@@ -439,7 +439,7 @@ function shapeAt(p, excludeId) {
   return null;
 }
 
-// ---------- Herramientas ----------
+// ---------- Tools ----------
 function setTool(next) {
   if (editing) commitEditing();
   tool = next;
@@ -461,12 +461,12 @@ function effectiveTool(e) {
     if (e.buttons & 32) return 'eraser';
     if (settings.penAutoDraw && tool === 'select') return settings.lastInk || 'pen';
   }
-  // Con lápiz detectado, el dedo selecciona y desplaza (como en una tableta).
+  // Once a pen is detected, a finger selects and pans (like on a tablet).
   if (e.pointerType === 'touch' && penSeen) return 'select-touch';
   return tool;
 }
 
-// ---------- Punteros ----------
+// ---------- Pointers ----------
 const touches = new Map();
 let penSeen = false;
 let penDown = false;
@@ -495,7 +495,7 @@ function onPointerDown(e) {
   const wp = toWorld(sp);
 
   if (e.pointerType === 'touch') {
-    if (penDown) return; // rechazo de palma: el lápiz manda
+    if (penDown) return; // palm rejection: the pen wins
     touches.set(e.pointerId, sp);
     if (touches.size === 2) {
       cancelGesture();
@@ -511,7 +511,7 @@ function onPointerDown(e) {
   }
   if (e.button === 2) return;
 
-  try { svg.setPointerCapture(e.pointerId); } catch { /* puntero ya liberado */ }
+  try { svg.setPointerCapture(e.pointerId); } catch { /* pointer already released */ }
   const active = effectiveTool(e);
   const pid = e.pointerId;
 
@@ -599,7 +599,7 @@ function startMove(e, wp, clickedId, wasSelected) {
   const dup = e.altKey && selection.size > 0;
   if (dup) duplicateSelection(0, false);
   const origin = new Map(selectedElements().map((el) => [el.id, el]));
-  // Objetivos de alineación: formas no seleccionadas.
+  // Alignment targets: unselected shapes.
   const xs = [], ys = [];
   for (const el of elements) {
     if (selection.has(el.id) || !isBoxElement(el)) continue;
@@ -812,14 +812,14 @@ function addInkPoint(g, ev) {
   const d = Math.hypot(wp.x - last[0], wp.y - last[1]);
   g.raw = wp;
   if (d < 0.5 / view.zoom) return;
-  const s = g.isPen ? 0.2 : 0.45; // suavizado de la mano
+  const s = g.isPen ? 0.2 : 0.45; // hand smoothing
   const x = last[0] + (wp.x - last[0]) * (1 - s);
   const y = last[1] + (wp.y - last[1]) * (1 - s);
   let p;
   if (g.isPen) {
     p = ev.pressure || 0.5;
   } else {
-    // Ratón o dedo: simulamos presión según la velocidad.
+    // Mouse or finger: simulate pressure from speed.
     const dt = Math.max(1, ev.timeStamp - g.lastT);
     const speed = (d * view.zoom) / dt;
     const target = clamp(0.85 - speed * 0.18, 0.28, 0.85);
@@ -956,7 +956,7 @@ function finishConnector(g, wp) {
   if (g.quick) {
     const src = lookup(g.quick.srcId);
     if (!g.moved) {
-      // Clic en el "+" : crea una forma gemela al lado y la conecta.
+      // Click on "+": create a twin shape next to it and connect them.
       const gap = 90;
       const pos = {
         right: { x: src.x + src.w + gap, y: src.y },
@@ -992,7 +992,7 @@ function onPointerCancel(e) {
   if (gesture && (gesture.pid === e.pointerId || gesture.type === 'pinch')) cancelGesture();
 }
 
-/** Aborta el gesto en curso y vuelve al último estado guardado en el historial. */
+/** Aborts the current gesture and restores the last state stored in the history. */
 function cancelGesture() {
   if (!gesture) return;
   gesture = null;
@@ -1002,7 +1002,7 @@ function cancelGesture() {
   restore(history.current);
 }
 
-// ---------- Rueda / trackpad ----------
+// ---------- Wheel / trackpad ----------
 svg.addEventListener('wheel', (e) => {
   e.preventDefault();
   const sp = screenPt(e);
@@ -1018,10 +1018,10 @@ svg.addEventListener('wheel', (e) => {
   }
 }, { passive: false });
 
-// ---------- Doble clic: editar texto ----------
+// ---------- Double-click: edit text ----------
 svg.addEventListener('dblclick', (e) => {
   if (tool !== 'select') return;
-  // Con captura de puntero el evento llega al <svg>; buscamos el elemento real bajo el cursor.
+  // With pointer capture the event targets the <svg>; find the real element under the cursor.
   const hit = document.elementFromPoint(e.clientX, e.clientY);
   const id = hit?.closest?.('[data-id]')?.dataset.id;
   const el = id && lookup(id);
@@ -1035,7 +1035,7 @@ svg.addEventListener('dblclick', (e) => {
   }
 });
 
-// ---------- Edición de texto ----------
+// ---------- Text editing ----------
 function startEditing(id, { selectAll = true } = {}) {
   const el = lookup(id);
   if (!el || !['shape', 'text', 'connector'].includes(el.type)) return;
@@ -1134,7 +1134,7 @@ function commitEditing() {
   render();
 }
 
-// ---------- Acciones de edición ----------
+// ---------- Edit actions ----------
 function deleteSelection() {
   if (!selection.size) return;
   const del = new Set(selection);
@@ -1197,7 +1197,7 @@ function copySelection() {
 
 function cutSelection() {
   if (!copySelection()) return;
-  pasteCount = -1; // pegar después de cortar deja los elementos en su sitio
+  pasteCount = -1; // pasting after a cut keeps the elements in place
   deleteSelection();
 }
 
@@ -1222,7 +1222,7 @@ async function pasteFromClipboard() {
   render();
 }
 
-/** ¿El foco está en un campo de texto? Entonces el comando lo resuelve Chromium. */
+/** Is focus in a text field? Then Chromium handles the command. */
 function nativeEditTarget() {
   return editing || isFormField(document.activeElement);
 }
@@ -1268,7 +1268,7 @@ function applyToSelection(fn, { types } = {}) {
   render();
 }
 
-// ---------- Imágenes ----------
+// ---------- Images ----------
 function insertImageFile(file, at) {
   const reader = new FileReader();
   reader.onload = () => insertImage(String(reader.result), at);
@@ -1312,7 +1312,7 @@ stage.addEventListener('drop', (e) => {
   });
 });
 
-// ---------- Teclado ----------
+// ---------- Keyboard ----------
 function isFormField(node) {
   return node && (node.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(node.tagName));
 }
@@ -1375,7 +1375,7 @@ window.addEventListener('blur', () => {
   stage.classList.remove('space');
 });
 
-// ---------- Barra de herramientas ----------
+// ---------- Toolbar ----------
 const TOOLBAR = [
   { tool: 'select', icon: 'select', label: N_('Select'), key: 'V' },
   { tool: 'hand', icon: 'hand', label: N_('Pan Canvas'), key: 'H' },
@@ -1425,7 +1425,7 @@ $('#zoom-in').addEventListener('click', () => zoomCenter(1.25));
 $('#zoom-out').addEventListener('click', () => zoomCenter(0.8));
 $('#zoom-label').addEventListener('click', () => (Math.abs(view.zoom - 1) < 0.01 ? zoomToFit() : zoomTo(1)));
 
-// ---------- Sub-barra (opciones de la herramienta) ----------
+// ---------- Sub-bar (tool options) ----------
 const LINE_STYLES = ['curve', 'straight', 'elbow'];
 const LINE_STYLE_LABELS = { curve: N_('Curved'), straight: N_('Straight'), elbow: N_('Elbow') };
 const ARROWS = [['none', 'arrowNone', N_('No Arrows')], ['end', 'arrowEnd', N_('Arrow at End')], ['both', 'arrowBoth', N_('Arrows at Both Ends')]];
@@ -1490,7 +1490,7 @@ subbarEl.addEventListener('click', (e) => {
   render();
 });
 
-// ---------- Inspector (propiedades de la selección) ----------
+// ---------- Inspector (selection properties) ----------
 let lastInspectorKey = null;
 
 function renderInspector() {
@@ -1569,7 +1569,7 @@ function renderInspector() {
   inspectorEl.innerHTML = html;
 }
 
-inspectorEl.addEventListener('pointerdown', (e) => e.preventDefault()); // no robar el foco al editor
+inspectorEl.addEventListener('pointerdown', (e) => e.preventDefault()); // do not steal focus from the editor
 inspectorEl.addEventListener('click', (e) => {
   const b = e.target.closest('[data-action]');
   if (!b) return;
@@ -1644,7 +1644,7 @@ inspectorEl.addEventListener('click', (e) => {
   }
 });
 
-// ---------- Archivos ----------
+// ---------- Files ----------
 function serialize() {
   const used = new Set(elements.filter((e) => e.type === 'image').map((e) => e.asset));
   const usedAssets = Object.fromEntries(Object.entries(assets).filter(([k]) => used.has(k)));
@@ -1737,7 +1737,7 @@ async function svgToPngBase64(svgText, bounds) {
   }
 }
 
-// ---------- Avisos ----------
+// ---------- Toasts ----------
 let toastTimer = null;
 function toast(msg) {
   const el = $('#toast');
@@ -1747,7 +1747,7 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('visible'), 1800);
 }
 
-// ---------- Menú nativo ----------
+// ---------- Native menu ----------
 api?.onMenu((cmd) => {
   switch (cmd) {
     case 'save': save(false); break;
@@ -1786,8 +1786,8 @@ api?.onMenu((cmd) => {
 api?.onFileLoad(loadDocument);
 window.drawnieIsEmpty = () => elements.length === 0 && history.current === history.saved && !hasFile;
 
-// ---------- Idioma ----------
-// Al cambiar de idioma se vuelve a pintar todo lo que tiene texto, sin recargar la ventana.
+// ---------- Language ----------
+// When the language changes, everything with text is repainted without reloading the window.
 onLocaleChange(() => {
   buildToolbar();
   updateThemeToggle();
@@ -1797,10 +1797,10 @@ onLocaleChange(() => {
   renderNow();
 });
 
-// ---------- Inicio ----------
+// ---------- Startup ----------
 buildToolbar();
 updateThemeToggle();
-if (settings.theme) api?.setTheme(settings.theme); // recuerda la última elección
+if (settings.theme) api?.setTheme(settings.theme); // remember the last choice
 stage.dataset.tool = tool;
 {
   const r = stageRect();
@@ -1810,7 +1810,7 @@ window.addEventListener('resize', () => render());
 updateDocState();
 render();
 
-// Accesos para depuración desde DevTools.
+// Debugging hooks for DevTools.
 window.__drawnie = {
   get elements() { return elements; },
   get view() { return view; },

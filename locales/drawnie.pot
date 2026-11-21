@@ -1,5 +1,5 @@
-# Plantilla de traducciones de Drawnie. Generada con: npm run i18n
-# No la edites a mano; crea o actualiza los .po.
+# Drawnie translation template. Generated with: npm run i18n
+# Do not edit it by hand; create or update the .po files instead.
 msgid ""
 msgstr ""
 "Project-Id-Version: Drawnie 0.1.0\n"

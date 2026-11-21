@@ -19,14 +19,14 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Pruebas del núcleo de traducciones: node --test tests/
+// Tests for the translation core: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { parsePO, parsePOEntries, compilePlural, createTranslator } from '../src/js/i18n-core.js';
 
 const SAMPLE = `
-# Comentario del traductor
+# Translator comment
 msgid ""
 msgstr ""
 "Language: es\\n"
@@ -69,7 +69,7 @@ msgstr "Di \\"hola\\""
 #~ msgstr "Viejo"
 `;
 
-test('lee cabeceras, contextos, plurales y multilínea', () => {
+test('parses headers, contexts, plurals and multiline strings', () => {
   const cat = parsePO(SAMPLE);
   const { t, tc, tn } = createTranslator(cat);
   assert.equal(cat.headers.Language, 'es');
@@ -82,7 +82,7 @@ test('lee cabeceras, contextos, plurales y multilínea', () => {
   assert.equal(t('Say "hi"'), 'Di "hola"');
 });
 
-test('ignora fuzzy, vacíos y obsoletos; usa el texto original', () => {
+test('ignores fuzzy, empty and obsolete entries; falls back to the original', () => {
   const { t, tn } = createTranslator(parsePO(SAMPLE));
   assert.equal(t('Draft'), 'Draft');
   assert.equal(t('Empty'), 'Empty');
@@ -91,20 +91,20 @@ test('ignora fuzzy, vacíos y obsoletos; usa el texto original', () => {
   assert.equal(tn('{n} item', '{n} items', 3), '3 items');
 });
 
-test('entradas obsoletas bajo petición', () => {
+test('returns obsolete entries on request', () => {
   const all = parsePOEntries(SAMPLE, { obsolete: true });
   const old = all.find((e) => e.id === 'Old');
   assert.ok(old.flags.includes('obsolete'));
   assert.equal(old.strs[0], 'Viejo');
 });
 
-test('variables con llaves', () => {
+test('replaces {placeholders}', () => {
   const { t } = createTranslator({});
   assert.equal(t('Hello {name}', { name: 'Ana' }), 'Hello Ana');
   assert.equal(t('Keep {missing}'), 'Keep {missing}');
 });
 
-test('reglas de plural de varios idiomas', () => {
+test('plural rules of several languages', () => {
   const ru = compilePlural('nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);');
   assert.deepEqual([1, 2, 5, 11, 21, 22, 25].map(ru), [0, 1, 2, 2, 0, 1, 2]);
   const fr = compilePlural('nplurals=2; plural=(n > 1);');
@@ -116,15 +116,15 @@ test('reglas de plural de varios idiomas', () => {
   assert.equal(broken(2), 1);
 });
 
-test('los catálogos del proyecto están completos y usan las mismas variables', () => {
+test('project catalogs are complete and use the same placeholders', () => {
   for (const f of ['es', 'en']) {
     const text = fs.readFileSync(new URL(`../locales/${f}.po`, import.meta.url), 'utf8');
     const entries = parsePOEntries(text).filter((e) => e.id);
-    assert.ok(entries.length > 50, `${f}.po tiene pocas entradas`);
+    assert.ok(entries.length > 50, `${f}.po has too few entries`);
     for (const e of entries) {
-      assert.ok(e.strs.every(Boolean), `${f}.po: falta traducir ${JSON.stringify(e.id)}`);
+      assert.ok(e.strs.every(Boolean), `${f}.po: missing translation for ${JSON.stringify(e.id)}`);
       const vars = (s) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join();
-      for (const s of e.strs) assert.equal(vars(s), vars(e.id), `${f}.po: variables distintas en ${JSON.stringify(e.id)}`);
+      for (const s of e.strs) assert.equal(vars(s), vars(e.id), `${f}.po: placeholders differ in ${JSON.stringify(e.id)}`);
     }
   }
 });

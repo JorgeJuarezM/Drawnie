@@ -19,7 +19,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Proceso principal de Drawnie: ventanas, menú nativo y acceso a archivos.
+// Drawnie main process: windows, native menu and file access.
 const { app, BrowserWindow, Menu, dialog, ipcMain, nativeTheme, shell, clipboard } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs/promises');
@@ -33,9 +33,9 @@ const COPYRIGHT = `© ${new Date().getFullYear()} ${AUTHOR.name}`;
 const isMac = process.platform === 'darwin';
 const fileFilters = () => [{ name: t('Drawnie board'), extensions: ['drawnie'] }];
 
-/** Estado por ventana: ruta del archivo y si hay cambios sin guardar. */
+/** Per-window state: file path and whether there are unsaved changes. */
 const windowState = new Map();
-/** Archivos que el SO pidió abrir antes de que la app estuviera lista. */
+/** Files the OS asked to open before the app was ready. */
 const pendingFiles = [];
 
 function createWindow(filePath = null) {
@@ -71,7 +71,7 @@ function createWindow(filePath = null) {
     if (filePath) openFileInWindow(win, filePath);
   });
 
-  // Los enlaces externos se abren en el navegador del sistema.
+  // External links open in the system browser.
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (/^https?:/.test(url)) shell.openExternal(url);
     return { action: 'deny' };
@@ -113,7 +113,7 @@ async function openFileInWindow(win, filePath) {
   }
 }
 
-/** Abre un archivo reutilizando la ventana si está vacía, o en una nueva. */
+/** Opens a file, reusing the window if it is empty, or in a new one. */
 async function openFile(filePath, preferredWin) {
   const target = preferredWin && !preferredWin.isDestroyed() ? preferredWin : null;
   if (target) {
@@ -192,7 +192,7 @@ function contactAuthor() {
   shell.openExternal(`mailto:${AUTHOR.email}?subject=${encodeURIComponent('Drawnie')}`);
 }
 
-/** Cambia el idioma de toda la app sin recargar las ventanas. */
+/** Changes the language of the whole app without reloading windows. */
 function setLanguage(value) {
   const catalog = i18n.setPreference(value);
   buildMenu();
@@ -202,7 +202,7 @@ function setLanguage(value) {
 
 function languageMenu() {
   const pref = i18n.getPreference();
-  // "Language" se añade en inglés para encontrar el menú aunque no se entienda el idioma actual.
+  // "Language" is appended in English so the menu can be found even if the current language is not understood.
   const label = i18n.getLocale() === 'en' ? 'Language' : `${t('Language')} (Language)`;
   return {
     label,
@@ -365,12 +365,12 @@ ipcMain.on('win:close-confirmed', (event) => {
 
 ipcMain.on('app:open', () => promptOpen());
 
-// Traducciones para la interfaz (síncrono: se necesitan antes de pintar).
+// Translations for the UI (synchronous: they are needed before the first paint).
 ipcMain.on('i18n:catalog', (event) => {
   event.returnValue = i18n.getCatalog();
 });
 
-// Tema elegido desde la interfaz: afecta a todas las ventanas.
+// Theme chosen from the UI: applies to every window.
 ipcMain.on('theme:set', (_event, mode) => {
   if (['light', 'dark', 'system'].includes(mode)) nativeTheme.themeSource = mode;
 });
@@ -381,7 +381,7 @@ ipcMain.on('app:open-path', (event, filePath) => {
   }
 });
 
-// Comandos de edición nativos (cuando se está escribiendo texto).
+// Native edit commands (while typing text).
 const NATIVE_EDIT = new Set(['undo', 'redo', 'cut', 'copy', 'paste', 'selectAll']);
 ipcMain.on('edit:native', (event, command) => {
   if (NATIVE_EDIT.has(command)) event.sender[command]();
@@ -399,16 +399,16 @@ ipcMain.on('clipboard:write', (_event, text) => {
   if (typeof text === 'string') clipboard.writeText(text);
 });
 
-// ---------- Ciclo de vida ----------
+// ---------- Lifecycle ----------
 
-// macOS: doble clic en un archivo .drawnie.
+// macOS: double-click on a .drawnie file.
 app.on('open-file', (event, filePath) => {
   event.preventDefault();
   if (app.isReady()) openFile(filePath, focusedWin());
   else pendingFiles.push(filePath);
 });
 
-// Windows: una sola instancia; los archivos llegan por argv.
+// Windows: single instance; files arrive through argv.
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();

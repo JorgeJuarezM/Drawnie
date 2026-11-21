@@ -1,151 +1,151 @@
 # Drawnie
 
-Pizarra infinita para crear diagramas sencillos y bonitos, inspirada en Freeform de macOS. Hecha con Electron, sin frameworks: el lienzo es SVG puro.
+An infinite whiteboard for simple, beautiful diagrams, inspired by macOS Freeform. Built with Electron and no frameworks: the canvas is plain SVG.
 
-## Características
+## Features
 
-- **Lienzo infinito** con cuadrícula de puntos, desplazamiento (rueda, trackpad, espacio + arrastrar, dos dedos) y zoom (pellizco, ⌘/Ctrl + rueda).
-- **Formas**: rectángulo, píldora, elipse, rombo, triángulo, hexágono y base de datos, con 11 estilos de color armoniosos y sombra suave.
-- **Notas adhesivas** y **texto libre** (doble clic en el lienzo para escribir).
-- **Conectores** que se pegan a las formas y las siguen: curvos, rectos o en ángulo; con flechas, línea discontinua y etiqueta de texto.
-- **Conexión rápida**: al seleccionar una forma aparecen cuatro “+”. Haz clic para crear una forma gemela conectada, o arrastra para conectar con otra.
-- **Lápiz digital**: trazo con grosor según la presión, suavizado, resaltador y borrador (incluido el extremo borrador de lápices como Surface Pen o Wacom).
-  - *El lápiz siempre dibuja* (activado por defecto): con la herramienta Selección, el lápiz dibuja y el ratón o el dedo seleccionan.
-  - Cuando se detecta un lápiz, el dedo selecciona y desplaza, y se ignora la palma mientras el lápiz toca la pantalla.
-- Guías de alineación al mover, redimensionar varios elementos a la vez, orden de capas, duplicar con ⌥/Alt + arrastrar.
-- Imágenes: arrastrar y soltar, pegar o insertar desde la barra.
-- Deshacer y rehacer, copiar y pegar entre pizarras, exportar a **PNG** o **SVG**.
-- Archivos `.drawnie` (JSON) asociados a la app, varias ventanas, modo claro y oscuro automáticos.
-- **Español e inglés**, con traducciones en archivos `.po` (gettext). El idioma se cambia en *Visualización → Idioma* sin reiniciar; por defecto se usa el del sistema.
+- **Infinite canvas** with a dot grid, panning (wheel, trackpad, Space + drag, two fingers) and zoom (pinch, ⌘/Ctrl + wheel).
+- **Shapes**: rectangle, pill, ellipse, diamond, triangle, hexagon and database, with 11 harmonious color styles and a soft shadow.
+- **Sticky notes** and **free text** (double-click the canvas to type).
+- **Connectors** that attach to shapes and follow them: curved, straight or elbow; with arrows, dashed lines and a text label.
+- **Quick connect**: selecting a shape shows four "+" handles. Click one to create a connected twin shape, or drag it to connect to another shape.
+- **Digital pen**: pressure-sensitive strokes, smoothing, highlighter and eraser (including the eraser end of pens such as Surface Pen or Wacom).
+  - *Pen always draws* (on by default): with the Select tool active, the pen draws while the mouse or a finger selects.
+  - Once a pen is detected, a finger selects and pans, and the palm is ignored while the pen touches the screen.
+- Alignment guides while moving, multi-element resizing, layer order, and duplicate with ⌥/Alt + drag.
+- Images: drag and drop, paste, or insert from the toolbar.
+- Undo and redo, copy and paste between boards, export to **PNG** or **SVG**.
+- `.drawnie` files (JSON) associated with the app, multiple windows, automatic light and dark mode.
+- **English and Spanish**, with translations in `.po` files (gettext). The language can be changed from *View → Language* without restarting; the system language is used by default.
 
-## Desarrollo
+## Development
 
 ```bash
 npm install
 npm start
-npm test          # pruebas del sistema de traducciones
+npm test          # translation system tests
 ```
 
-> Si `npm start` falla con `Cannot find module 'electron'` dentro de VS Code, es porque la variable `ELECTRON_RUN_AS_NODE` está definida en ese entorno. Ejecuta `env -u ELECTRON_RUN_AS_NODE npm start` o usa una terminal normal.
+> If `npm start` fails with `Cannot find module 'electron'` inside VS Code, the `ELECTRON_RUN_AS_NODE` variable is set in that environment. Run `env -u ELECTRON_RUN_AS_NODE npm start` or use a regular terminal.
 
-## Distribución
+## Packaging
 
 ```bash
-npm run dist:mac   # .dmg y .zip para Apple Silicon (arm64) e Intel (x64)
-npm run dist:win   # instalador NSIS para x64 y arm64
-npm run dist       # ambos
+npm run dist:mac   # .dmg and .zip for Apple Silicon (arm64) and Intel (x64)
+npm run dist:win   # NSIS installer for x64 and arm64
+npm run dist       # both
 ```
 
-Los paquetes quedan en `dist/`:
+The packages are written to `dist/`:
 
 ```
-Drawnie-<versión>-mac-arm64.dmg / .zip   macOS Apple Silicon
-Drawnie-<versión>-mac-x64.dmg / .zip     macOS Intel
-Drawnie-Setup-<versión>.exe              Windows (x64 y arm64)
+Drawnie-<version>-mac-arm64.dmg / .zip   macOS Apple Silicon
+Drawnie-<version>-mac-x64.dmg / .zip     macOS Intel
+Drawnie-Setup-<version>.exe              Windows (x64 and arm64)
 ```
 
-### Compilación automática (GitHub Actions)
+- **Icon**: generated from `build/icon.svg` with `npm run icon`, which writes `build/icon.png`. electron-builder derives the `.icns` and `.ico` from it.
+- **macOS signing**: without a certificate the app is unsigned and Gatekeeper blocks it the first time (right-click → Open). To distribute it, set `CSC_LINK` / `CSC_KEY_PASSWORD` and configure notarization (`APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`).
+- **Windows from macOS**: the NSIS installer can be built on macOS. To sign it with Authenticode, build on Windows or in CI.
 
-El workflow [`.github/workflows/build.yml`](.github/workflows/build.yml):
+### Automated builds (GitHub Actions)
 
-- En cada push a `main` y en cada pull request ejecuta las pruebas y comprueba que las traducciones estén completas.
-- Para **publicar una versión**: sube la versión en `package.json`, haz commit y crea el tag correspondiente:
+The [`.github/workflows/build.yml`](.github/workflows/build.yml) workflow:
+
+- Runs the tests and checks that the translations are complete on every push to `main` and on every pull request.
+- To **release a version**, bump the version in `package.json`, commit, and create the matching tag:
 
   ```bash
-  npm version 0.2.0 -m "Versión %s"   # actualiza package.json, hace commit y crea el tag v0.2.0
+  npm version 0.2.0 -m "Release %s"   # updates package.json, commits and creates the v0.2.0 tag
   git push --follow-tags
   ```
 
-  El workflow genera los instaladores en macOS y Windows y crea la *Release* en GitHub con todos ellos adjuntos. Si el tag no coincide con la versión de `package.json`, se detiene.
-- **Compilación manual**: en *Actions → Build → Run workflow* se generan los instaladores sin publicar nada; se descargan como artefactos durante 14 días.
+  The workflow builds the installers on macOS and Windows and creates the GitHub *Release* with all of them attached. It stops if the tag does not match the version in `package.json`.
+- **Manual build**: *Actions → Build → Run workflow* builds the installers without publishing anything; they can be downloaded as artifacts for 14 days.
 
-Por ahora los instaladores se generan sin firmar. Para firmarlos hay que añadir los certificados como *secrets* del repositorio (`CSC_LINK`, `CSC_KEY_PASSWORD` y, en macOS, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`), pasarlos como variables de entorno en el paso "Generar instaladores" y quitar `CSC_IDENTITY_AUTO_DISCOVERY`.
+The installers are currently unsigned. To sign them, add the certificates as repository *secrets* (`CSC_LINK`, `CSC_KEY_PASSWORD` and, for macOS, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`), pass them as environment variables to the "Build installers" step and remove `CSC_IDENTITY_AUTO_DISCOVERY`.
 
-- **Icono**: se genera desde `build/icon.svg` con `npm run icon`, que escribe `build/icon.png`. electron-builder crea a partir de él el `.icns` y el `.ico`.
-- **Firma en macOS**: sin certificado, la app no queda firmada y Gatekeeper la bloquea la primera vez (clic derecho → Abrir). Para distribuirla, define `CSC_LINK` / `CSC_KEY_PASSWORD` y configura la notarización (`APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`).
-- **Windows desde macOS**: el instalador NSIS se puede generar desde macOS. Para firmarlo con Authenticode conviene compilar en Windows o en CI.
+## Translations
 
-## Traducciones
-
-Los textos siguen el modelo de gettext: en el código se escriben en inglés y cada idioma tiene su archivo `.po` en `locales/`. Se pueden editar con cualquier editor de texto o con herramientas como Poedit, Weblate o Crowdin.
+Strings follow the gettext model: they are written in English in the code, and each language has its own `.po` file in `locales/`. They can be edited with any text editor or with tools such as Poedit, Weblate or Crowdin.
 
 ```
-locales/drawnie.pot   Plantilla con todos los textos (generada, no editar)
-locales/es.po         Español
-locales/en.po         Inglés (permite ajustar la redacción sin tocar el código)
+locales/drawnie.pot   Template with every string (generated, do not edit)
+locales/es.po         Spanish
+locales/en.po         English (lets you adjust the wording without touching the code)
 ```
 
-En el código:
+In the code:
 
 ```js
-import { t, tc, tn, N_ } from './i18n.js';   // en main.js: const { t } = i18n
+import { t, tc, tn, N_ } from './i18n.js';   // in main.js: const { t } = i18n
 
-t('Save')                                // texto simple
-t('Could not save: {error}', { error })  // con variables
-tc('verb', 'Open')                       // con contexto (msgctxt)
-tn('{n} shape', '{n} shapes', count)     // plurales según Plural-Forms
-N_('Rectangle')                          // solo marca para extraer; se traduce después con t()
+t('Save')                                // plain string
+t('Could not save: {error}', { error })  // with placeholders
+tc('verb', 'Open')                       // with context (msgctxt)
+tn('{n} shape', '{n} shapes', count)     // plurals according to Plural-Forms
+N_('Rectangle')                          // mark for extraction only; translate later with t()
 ```
 
-En el HTML se usan atributos: `data-i18n` (texto), `data-i18n-title` y `data-i18n-aria-label`.
+In the HTML, use the `data-i18n` (text), `data-i18n-title` and `data-i18n-aria-label` attributes.
 
-Flujo de trabajo:
+Workflow:
 
 ```bash
-npm run i18n              # extrae los textos y actualiza drawnie.pot y cada .po (como xgettext + msgmerge)
-npm run i18n:check        # lista lo que falta por traducir; sale con error si hay pendientes
-npm run i18n -- --add fr  # crea locales/fr.po para un idioma nuevo (como msginit)
+npm run i18n              # extracts the strings and updates drawnie.pot and every .po (like xgettext + msgmerge)
+npm run i18n:check        # lists missing translations; exits with an error if any
+npm run i18n -- --add fr  # creates locales/fr.po for a new language (like msginit)
 ```
 
-- Los textos nuevos aparecen en los `.po` con `msgstr ""`. Mientras no se traduzcan, se muestra el original en inglés.
-- Las entradas marcadas `#, fuzzy` se ignoran hasta que se revisen.
-- Los textos que desaparecen del código se conservan al final como obsoletos (`#~`). Si vuelven, se recupera su traducción.
-- Un idioma nuevo aparece solo en el menú *Idioma* en cuanto existe su `.po`.
-- La preferencia de idioma se guarda en `preferences.json`, dentro de la carpeta de datos de la app.
+- New strings appear in the `.po` files with `msgstr ""`. Until they are translated, the English original is shown.
+- Entries flagged `#, fuzzy` are ignored until they are reviewed.
+- Strings removed from the code are kept at the end as obsolete (`#~`). If they come back, their translation is restored.
+- A new language shows up in the *Language* menu as soon as its `.po` file exists.
+- The language preference is stored in `preferences.json`, inside the app's data folder.
 
-## Atajos
+## Shortcuts
 
-| Tecla | Acción | Tecla | Acción |
+| Key | Action | Key | Action |
 |---|---|---|---|
-| V | Seleccionar | P | Pluma |
-| H / Espacio | Mover lienzo | M | Resaltador |
-| R / O | Rectángulo / Elipse | E | Borrador |
-| S | Nota adhesiva | Enter | Editar texto |
-| T | Texto | Supr / ⌫ | Eliminar |
-| A | Conector | Flechas | Mover (⇧ = 10 px) |
-| ⌘/Ctrl + D | Duplicar | ⌘/Ctrl + 0 / 1 | 100 % / Ajustar |
-| ⌘/Ctrl + ] / [ | Adelante / Atrás | ⌘/Ctrl + ⇧ + E | Exportar PNG |
+| V | Select | P | Pen |
+| H / Space | Pan canvas | M | Highlighter |
+| R / O | Rectangle / Ellipse | E | Eraser |
+| S | Sticky note | Enter | Edit text |
+| T | Text | Delete / ⌫ | Delete |
+| A | Connector | Arrows | Move (⇧ = 10 px) |
+| ⌘/Ctrl + D | Duplicate | ⌘/Ctrl + 0 / 1 | 100 % / Fit |
+| ⌘/Ctrl + ] / [ | Forward / Backward | ⌘/Ctrl + ⇧ + E | Export PNG |
 
-Mantén ⇧ para conservar proporciones y ⌘/Ctrl para desactivar las guías al mover.
+Hold ⇧ to keep proportions and ⌘/Ctrl to disable the guides while moving.
 
-## Estructura
+## Project structure
 
 ```
-main.js            Proceso principal: ventanas, menú nativo, archivos, portapapeles
-i18n.js            Idioma activo, carga de los .po y preferencia guardada
-locales/           Traducciones (.pot y .po)
-scripts/i18n.mjs   Extracción y actualización de traducciones
-preload.js         Puente seguro (contextIsolation + sandbox)
-src/index.html     Interfaz
-src/styles.css     Estilos (claro/oscuro)
-src/js/app.js      Estado, herramientas, gestos, historial, inspector
-src/js/render.js   Elementos → SVG (pantalla y exportación)
-src/js/geometry.js Marcos, anclajes y trazado de conectores
-src/js/ink.js      Trazos sensibles a la presión
-src/js/text.js     Medición y ajuste de texto
-src/js/palette.js  Colores y medidas
-src/js/icons.js    Iconos
-src/js/i18n.js     Traducciones en la interfaz (t, tn, tc, data-i18n)
-src/js/i18n-core.js Lectura de .po, plurales y formato (compartido)
+main.js              Main process: windows, native menu, files, clipboard
+preload.js           Secure bridge (contextIsolation + sandbox)
+i18n.js              Active language, .po loading and saved preference
+locales/             Translations (.pot and .po)
+scripts/i18n.mjs     String extraction and translation updates
+src/index.html       UI
+src/styles.css       Styles (light/dark)
+src/js/app.js        State, tools, gestures, history, inspector
+src/js/render.js     Elements → SVG (screen and export)
+src/js/geometry.js   Frames, anchors and connector routing
+src/js/ink.js        Pressure-sensitive strokes
+src/js/text.js       Text measuring and wrapping
+src/js/palette.js    Colors and sizes
+src/js/icons.js      Icons
+src/js/i18n.js       Translations in the UI (t, tn, tc, data-i18n)
+src/js/i18n-core.js  .po parsing, plurals and formatting (shared)
 ```
 
-## Licencia
+## License
 
 Copyright (C) 2026 Jorge Juarez.
 
-Drawnie es software libre bajo la licencia [GNU AGPL-3.0](LICENSE) o posterior, con términos adicionales de atribución descritos en [NOTICE](NOTICE):
+Drawnie is free software licensed under the [GNU AGPL-3.0](LICENSE) or later, with additional attribution terms described in [NOTICE](NOTICE):
 
-- Puedes usarlo, estudiarlo, modificarlo y redistribuirlo.
-- Cualquier versión modificada o derivada debe publicarse con la misma licencia y con su código fuente disponible, incluso si se ofrece como servicio en red. No se puede convertir en software cerrado.
-- Debe conservarse el aviso de autoría de Jorge Juarez en el código, en la documentación y en la pantalla "Acerca de".
-- Las versiones modificadas deben indicarlo y no presentarse como el Drawnie original.
+- You may use, study, modify and redistribute it.
+- Any modified or derived version must be released under the same license with its source code available, even when it is offered as a network service. It cannot be turned into closed-source software.
+- The authorship notice of Jorge Juarez must be kept in the code, in the documentation and in the "About" screen.
+- Modified versions must say so and must not be presented as the original Drawnie.

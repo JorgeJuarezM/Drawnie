@@ -19,7 +19,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Traducciones en la interfaz. El catálogo lo entrega el proceso principal.
+// Translations in the UI. The catalog is provided by the main process.
 import { createTranslator, N_ } from './i18n-core.js';
 
 const api = window.drawnie;
@@ -34,9 +34,9 @@ export { N_ };
 export const getLocale = () => catalog.locale;
 
 /**
- * Traduce el HTML estático:
- *   data-i18n="Texto"          → textContent
- *   data-i18n-title="Texto"    → title
+ * Translates the static HTML:
+ *   data-i18n="Text"           → textContent
+ *   data-i18n-title="Text"     → title
  *   data-i18n-aria-label="…"   → aria-label
  */
 export function translateDOM(root = document) {
@@ -46,7 +46,7 @@ export function translateDOM(root = document) {
   for (const el of root.querySelectorAll('[data-i18n-aria-label]')) el.setAttribute('aria-label', t(el.dataset.i18nAriaLabel));
 }
 
-/** Avisa cuando el usuario cambia de idioma desde el menú. */
+/** Notifies when the user changes the language from the menu. */
 export function onLocaleChange(fn) {
   listeners.add(fn);
   return () => listeners.delete(fn);

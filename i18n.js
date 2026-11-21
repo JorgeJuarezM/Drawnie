@@ -19,15 +19,15 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Idiomas en el proceso principal: carga los .po de locales/, elige el idioma
-// y recuerda la preferencia del usuario.
+// Languages in the main process: loads the .po files from locales/, picks the
+// language and remembers the user's preference.
 const { app } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs');
 const { pathToFileURL } = require('node:url');
 
 const LOCALES_DIR = path.join(__dirname, 'locales');
-const SOURCE_LOCALE = 'en'; // idioma de los msgid
+const SOURCE_LOCALE = 'en'; // language of the msgids
 
 let core = null;
 let catalog = { locale: SOURCE_LOCALE, pluralForms: '', messages: {} };
@@ -49,10 +49,10 @@ function writePrefs(patch) {
   try {
     fs.mkdirSync(path.dirname(prefsPath()), { recursive: true });
     fs.writeFileSync(prefsPath(), JSON.stringify(next, null, 2));
-  } catch { /* sin permisos: se usará la preferencia solo en esta sesión */ }
+  } catch { /* no permission: the preference only lasts for this session */ }
 }
 
-/** Códigos de los .po disponibles (es, en, pt-BR…). */
+/** Codes of the available .po files (es, en, pt-BR…). */
 function available() {
   try {
     return fs.readdirSync(LOCALES_DIR).filter((f) => f.endsWith('.po')).map((f) => f.slice(0, -3)).sort();
@@ -61,7 +61,7 @@ function available() {
   }
 }
 
-/** Busca el mejor .po para una lista de idiomas tipo "es-MX", "en-US". */
+/** Finds the best .po for a list of languages such as "es-MX", "en-US". */
 function match(candidates) {
   const locales = available();
   const norm = (s) => s.toLowerCase().replace('_', '-');
@@ -96,7 +96,7 @@ function activate() {
   translator = core.createTranslator(catalog);
 }
 
-/** Carga el núcleo (módulo ES compartido con la interfaz) y el idioma guardado. */
+/** Loads the core (ES module shared with the UI) and the saved language. */
 async function init() {
   core = await import(pathToFileURL(path.join(__dirname, 'src', 'js', 'i18n-core.js')).href);
   const saved = readPrefs().language;
@@ -104,7 +104,7 @@ async function init() {
   activate();
 }
 
-/** Cambia el idioma ('system' o un código). Devuelve el catálogo nuevo. */
+/** Changes the language ('system' or a code). Returns the new catalog. */
 function setPreference(value) {
   preference = value === 'system' || available().includes(value) ? value : 'system';
   writePrefs({ language: preference });
@@ -112,7 +112,7 @@ function setPreference(value) {
   return catalog;
 }
 
-/** Nombre del idioma escrito en ese mismo idioma: "Español", "English". */
+/** Language name written in that same language: "Español", "English". */
 function nativeName(locale) {
   try {
     const name = new Intl.DisplayNames([locale], { type: 'language' }).of(locale);

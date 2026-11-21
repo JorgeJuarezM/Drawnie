@@ -19,7 +19,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Convierte elementos del documento en marcado SVG (para pantalla y exportación).
+// Turns document elements into SVG markup (for the screen and for export).
 import { connectorGeometry, textBox, cylinderRy } from './geometry.js';
 import { inkOutline, inkCenterline } from './ink.js';
 import { wrapText, measure, FONT_FAMILY, LINE_HEIGHT } from './text.js';
@@ -87,7 +87,7 @@ function shapeBody(el, fill, stroke, sw) {
 }
 
 /**
- * Devuelve { transform, markup } para un elemento.
+ * Returns { transform, markup } for an element.
  * ctx: { lookup, theme, editingId, assets }
  */
 export function elementSVG(el, ctx) {
@@ -177,7 +177,7 @@ export function elementSVG(el, ctx) {
   return { transform: null, markup: '' };
 }
 
-/** Documento SVG autónomo con los elementos dados. */
+/** Standalone SVG document with the given elements. */
 export function buildExportSVG(elements, bounds, ctx, background) {
   const body = elements
     .map((el) => {

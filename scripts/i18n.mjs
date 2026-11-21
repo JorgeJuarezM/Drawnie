@@ -20,15 +20,15 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Herramientas de traducción al estilo gettext, sin dependencias:
+// gettext-style translation tools, with no dependencies:
 //
-//   node scripts/i18n.mjs            Extrae los textos (→ locales/drawnie.pot) y actualiza cada .po
-//   node scripts/i18n.mjs --check    Informa de textos sin traducir o dudosos (sale con error si hay)
-//   node scripts/i18n.mjs --add fr   Crea locales/fr.po a partir de la plantilla
+//   node scripts/i18n.mjs            Extracts the strings (→ locales/drawnie.pot) and updates every .po
+//   node scripts/i18n.mjs --check    Reports untranslated or fuzzy strings (exits with an error if any)
+//   node scripts/i18n.mjs --add fr   Creates locales/fr.po from the template
 //
-// Funciones que se extraen del código:
-//   t('Texto')  tc('contexto', 'Texto')  tn('Uno', 'Varios', n)  tnc('ctx', 'Uno', 'Varios', n)  N_('Texto')
-// Y en el HTML: data-i18n, data-i18n-title, data-i18n-aria-label.
+// Functions extracted from the code:
+//   t('Text')  tc('context', 'Text')  tn('One', 'Many', n)  tnc('ctx', 'One', 'Many', n)  N_('Text')
+// And in the HTML: data-i18n, data-i18n-title, data-i18n-aria-label.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -48,7 +48,7 @@ const SOURCES = [
   'src/index.html',
 ];
 
-/** Reglas de plural de gettext para crear archivos nuevos. */
+/** gettext plural rules used when creating new files. */
 const PLURAL_RULES = {
   default: 'nplurals=2; plural=(n != 1);',
   fr: 'nplurals=2; plural=(n > 1);',
@@ -58,12 +58,12 @@ const PLURAL_RULES = {
   pl: 'nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);',
 };
 
-// ---------- Extracción ----------
+// ---------- Extraction ----------
 
 const KEYWORDS = { t: ['id'], N_: ['id'], tc: ['ctx', 'id'], tn: ['id', 'idPlural'], tnc: ['ctx', 'id', 'idPlural'] };
 const CALL = /(?<![\w$.])(tnc|tn|tc|t|N_)\(\s*/g;
 
-/** Lee un literal de cadena JS en src[i]. Devuelve { value, end } o null si no es literal simple. */
+/** Reads a JS string literal at src[i]. Returns { value, end }, or null if it is not a plain literal. */
 function readString(src, i) {
   const q = src[i];
   if (q !== "'" && q !== '"' && q !== '`') return null;
@@ -77,10 +77,10 @@ function readString(src, i) {
         const hex = src[j + 1] === '{' ? src.slice(j + 2, src.indexOf('}', j)) : src.slice(j + 1, j + 5);
         out += String.fromCodePoint(parseInt(hex, 16));
         j += src[j + 1] === '{' ? hex.length + 2 : 4;
-      } else if (n === '\n') { /* continuación de línea */ } else out += map[n] ?? n;
+      } else if (n === '\n') { /* line continuation */ } else out += map[n] ?? n;
       continue;
     }
-    if (q === '`' && c === '$' && src[j + 1] === '{') return null; // plantilla con variables: no se extrae
+    if (q === '`' && c === '$' && src[j + 1] === '{') return null; // template with variables: not extracted
     if (c === q) return { value: out, end: j + 1 };
     if (c === '\n' && q !== '`') return null;
     out += c;
@@ -145,7 +145,7 @@ function extract() {
   return [...found.values()];
 }
 
-// ---------- Escritura de .po ----------
+// ---------- Writing .po files ----------
 
 function quote(s) {
   const esc = (x) => x.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\t/g, '\\t').replace(/\r/g, '\\r').replace(/\n/g, '\\n');
@@ -185,7 +185,7 @@ function writePO(file, { headers, comments = [], entries, obsolete = [] }) {
 const nplurals = (headers) => Number(/nplurals\s*=\s*(\d+)/.exec(headers['Plural-Forms'] || '')?.[1] || 2);
 const keyOf = (e) => (e.ctx ? e.ctx + CTX_SEP + e.id : e.id);
 
-// ---------- Comandos ----------
+// ---------- Commands ----------
 
 function poFiles() {
   return fs.readdirSync(LOCALES).filter((f) => f.endsWith('.po')).sort();
@@ -205,7 +205,7 @@ function updateAll() {
   const template = extract();
   fs.mkdirSync(LOCALES, { recursive: true });
   writePO(POT, {
-    comments: ['Plantilla de traducciones de Drawnie. Generada con: npm run i18n', 'No la edites a mano; crea o actualiza los .po.'],
+    comments: ['Drawnie translation template. Generated with: npm run i18n', 'Do not edit it by hand; create or update the .po files instead.'],
     headers: {
       'Project-Id-Version': `Drawnie ${pkg.version}`,
       'MIME-Version': '1.0',
@@ -215,7 +215,7 @@ function updateAll() {
     },
     entries: template.map((e) => ({ ...e, strs: e.idPlural ? ['', ''] : [''] })),
   });
-  console.log(`locales/drawnie.pot: ${template.length} textos`);
+  console.log(`locales/drawnie.pot: ${template.length} strings`);
 
   for (const f of poFiles()) {
     const file = path.join(LOCALES, f);
@@ -235,7 +235,7 @@ function updateAll() {
         added++;
         strs = tpl.idPlural ? Array.from({ length: n }, () => '') : [''];
       }
-      // En el idioma de origen, lo que falte se rellena con el propio texto (como msgen).
+      // In the source language, missing entries are filled with the msgid itself (like msgen).
       if (isSource) strs = strs.map((s, i) => s || (tpl.idPlural && i > 0 ? tpl.idPlural : tpl.id));
       return {
         ...tpl,
@@ -247,7 +247,7 @@ function updateAll() {
     const obsolete = [...old.values()].filter((e) => e.strs.some(Boolean));
     po.headers['Project-Id-Version'] = `Drawnie ${pkg.version}`;
     writePO(file, { headers: po.headers, comments: po.comments, entries, obsolete });
-    console.log(`locales/${f}: ${added} nuevos, ${obsolete.length} obsoletos`);
+    console.log(`locales/${f}: ${added} new, ${obsolete.length} obsolete`);
   }
 }
 
@@ -259,7 +259,7 @@ function check() {
     const missing = live.filter((e) => !e.strs.length || e.strs.some((s) => !s));
     const fuzzy = live.filter((e) => e.flags.includes('fuzzy'));
     const done = live.length - missing.length - fuzzy.length;
-    console.log(`${f}: ${done}/${live.length} traducidos${missing.length ? `, ${missing.length} sin traducir` : ''}${fuzzy.length ? `, ${fuzzy.length} dudosos` : ''}`);
+    console.log(`${f}: ${done}/${live.length} translated${missing.length ? `, ${missing.length} untranslated` : ''}${fuzzy.length ? `, ${fuzzy.length} fuzzy` : ''}`);
     for (const e of [...missing, ...fuzzy]) console.log(`   - ${e.ctx ? `[${e.ctx}] ` : ''}${JSON.stringify(e.id)}`);
     problems += missing.length + fuzzy.length;
   }
@@ -268,16 +268,16 @@ function check() {
 
 function addLocale(code) {
   if (!code || !/^[a-z]{2,3}(-[A-Za-z0-9]+)?$/.test(code)) {
-    console.error('Uso: npm run i18n -- --add <código>   (p. ej. fr, pt-BR)');
+    console.error('Usage: npm run i18n -- --add <code>   (e.g. fr, pt-BR)');
     process.exit(1);
   }
   const file = path.join(LOCALES, `${code}.po`);
   if (fs.existsSync(file)) {
-    console.error(`locales/${code}.po ya existe`);
+    console.error(`locales/${code}.po already exists`);
     process.exit(1);
   }
   writePO(file, {
-    comments: [`Traducción de Drawnie: ${code}`],
+    comments: [`Drawnie translation: ${code}`],
     headers: {
       'Project-Id-Version': `Drawnie ${pkg.version}`,
       Language: code,
@@ -289,7 +289,7 @@ function addLocale(code) {
     entries: [],
   });
   updateAll();
-  console.log(`Creado locales/${code}.po. Revisa "Plural-Forms" en la cabecera si el idioma lo necesita.`);
+  console.log(`Created locales/${code}.po. Check "Plural-Forms" in the header if the language needs it.`);
 }
 
 const args = process.argv.slice(2);

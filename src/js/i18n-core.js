@@ -19,10 +19,10 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Núcleo de traducciones estilo gettext: lectura de archivos .po, plurales y formato.
-// Sin dependencias ni acceso a disco: lo usan el proceso principal, la interfaz y los scripts.
+// gettext-style translation core: .po parsing, plurals and formatting.
+// No dependencies and no disk access: used by the main process, the UI and the scripts.
 
-/** Separador estándar de gettext entre contexto (msgctxt) y msgid. */
+/** Standard gettext separator between context (msgctxt) and msgid. */
 export const CTX_SEP = '\u0004';
 
 const keyOf = (ctx, id) => (ctx ? ctx + CTX_SEP + id : id);
@@ -35,9 +35,9 @@ function unescapePO(s) {
 }
 
 /**
- * Lee un archivo .po y devuelve sus entradas tal cual, con comentarios y banderas.
- * Las entradas obsoletas (#~) se descartan, salvo con { obsolete: true }:
- * entonces se incluyen con la bandera "obsolete".
+ * Parses a .po file and returns its entries as they are, with comments and flags.
+ * Obsolete entries (#~) are skipped unless { obsolete: true } is passed,
+ * in which case they are included with the "obsolete" flag.
  */
 export function parsePOEntries(text, { obsolete = false } = {}) {
   const entries = [];
@@ -69,7 +69,7 @@ export function parsePOEntries(text, { obsolete = false } = {}) {
       isObsolete = true;
     }
     if (line.startsWith('#')) {
-      // Un comentario después de msgstr empieza una entrada nueva.
+      // A comment after msgstr starts a new entry.
       if (cur && cur.id !== null && field) flush();
       const e = start();
       if (line.startsWith('#,')) e.flags.push(...line.slice(2).split(',').map((f) => f.trim()).filter(Boolean));
@@ -99,7 +99,7 @@ export function parsePOEntries(text, { obsolete = false } = {}) {
   return entries;
 }
 
-/** Convierte el texto de cabecera ("Clave: valor\n…") en un objeto. */
+/** Turns the header text ("Key: value\n…") into an object. */
 export function parseHeaders(text) {
   const headers = {};
   for (const line of String(text || '').split('\n')) {
@@ -110,9 +110,9 @@ export function parseHeaders(text) {
 }
 
 /**
- * Lee un .po y devuelve un catálogo listo para traducir:
- * { headers, pluralForms, messages: { clave: [msgstr, …] } }.
- * Se ignoran las traducciones vacías y las marcadas como "fuzzy".
+ * Parses a .po file into a catalog ready for translating:
+ * { headers, pluralForms, messages: { key: [msgstr, …] } }.
+ * Empty translations and those flagged "fuzzy" are ignored.
  */
 export function parsePO(text) {
   const entries = parsePOEntries(text);
@@ -130,9 +130,9 @@ export function parsePO(text) {
   return { headers, pluralForms: headers['Plural-Forms'] || '', messages };
 }
 
-// ---------- Plurales ----------
-// La expresión de "Plural-Forms" es C (p. ej. "n != 1" o la del ruso).
-// Se interpreta con un analizador propio: nada de eval, que la CSP prohíbe.
+// ---------- Plurals ----------
+// The "Plural-Forms" expression is C (e.g. "n != 1" or the Russian one).
+// It is evaluated by a small parser: no eval, which the CSP forbids.
 
 const TOKEN = /\s*(\d+|n|&&|\|\||[=!<>]=|[-+*/%<>!?:()])/y;
 
@@ -141,7 +141,7 @@ function tokenize(src) {
   TOKEN.lastIndex = 0;
   let m;
   while (TOKEN.lastIndex < src.length && (m = TOKEN.exec(src))) tokens.push(m[1]);
-  if (src.slice(TOKEN.lastIndex).trim()) throw new Error(`Plural-Forms no válido: ${src}`);
+  if (src.slice(TOKEN.lastIndex).trim()) throw new Error(`Invalid Plural-Forms: ${src}`);
   return tokens;
 }
 
@@ -159,7 +159,7 @@ function parseExpr(tokens) {
   let i = 0;
   const peek = () => tokens[i];
   const next = () => tokens[i++];
-  const expect = (t) => { if (next() !== t) throw new Error(`Se esperaba "${t}" en Plural-Forms`); };
+  const expect = (t) => { if (next() !== t) throw new Error(`Expected "${t}" in Plural-Forms`); };
 
   const ternary = () => {
     const cond = binary(0);
@@ -190,15 +190,15 @@ function parseExpr(tokens) {
     if (t === '(') { const v = ternary(); expect(')'); return v; }
     if (t === 'n') return (n) => n;
     if (/^\d+$/.test(t ?? '')) { const c = Number(t); return () => c; }
-    throw new Error(`Token inesperado en Plural-Forms: ${t}`);
+    throw new Error(`Unexpected token in Plural-Forms: ${t}`);
   };
 
   const fn = ternary();
-  if (i !== tokens.length) throw new Error('Sobra texto en Plural-Forms');
+  if (i !== tokens.length) throw new Error('Trailing text in Plural-Forms');
   return fn;
 }
 
-/** Devuelve una función n → índice de msgstr[]. Por defecto, la regla del inglés. */
+/** Returns a function n → msgstr[] index. Defaults to the English rule. */
 export function compilePlural(pluralForms) {
   const fallback = (n) => (n === 1 ? 0 : 1);
   const m = /plural\s*=\s*([^;]+)/.exec(pluralForms || '');
@@ -211,21 +211,21 @@ export function compilePlural(pluralForms) {
   }
 }
 
-// ---------- Traductor ----------
+// ---------- Translator ----------
 
-/** Sustituye {nombre} por vars.nombre. Las llaves sin valor se dejan tal cual. */
+/** Replaces {name} with vars.name. Placeholders without a value are left as they are. */
 export function format(str, vars) {
   if (!vars) return str;
   return str.replace(/\{(\w+)\}/g, (all, k) => (k in vars ? String(vars[k]) : all));
 }
 
 /**
- * Crea las funciones de traducción a partir de un catálogo { messages, pluralForms }.
+ * Creates the translation functions from a catalog { messages, pluralForms }.
  *  t(msgid, vars)                    → gettext
- *  tc(contexto, msgid, vars)         → pgettext
- *  tn(singular, plural, n, vars)     → ngettext ({n} queda disponible en el texto)
- *  tnc(contexto, singular, plural, n, vars)
- * Si falta una traducción se usa el texto original (inglés).
+ *  tc(context, msgid, vars)          → pgettext
+ *  tn(singular, plural, n, vars)     → ngettext ({n} is available in the text)
+ *  tnc(context, singular, plural, n, vars)
+ * When a translation is missing, the original (English) text is used.
  */
 export function createTranslator(catalog = {}) {
   const messages = catalog.messages || {};
@@ -245,5 +245,5 @@ export function createTranslator(catalog = {}) {
   };
 }
 
-/** Marca un texto para extraerlo sin traducirlo todavía (gettext_noop). */
+/** Marks a string for extraction without translating it yet (gettext_noop). */
 export const N_ = (id) => id;

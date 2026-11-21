@@ -2,7 +2,7 @@
   "name": "drawnie",
   "productName": "Drawnie",
   "version": "0.1.0",
-  "description": "Pizarra infinita para crear diagramas bonitos, con soporte para lápiz.",
+  "description": "Infinite whiteboard for simple, beautiful diagrams, with pen support.",
   "main": "main.js",
   "author": {
     "name": "Jorge Juarez",
@@ -42,7 +42,7 @@
       {
         "ext": "drawnie",
         "name": "Drawnie Board",
-        "description": "Pizarra de Drawnie",
+        "description": "Drawnie board",
         "role": "Editor"
       }
     ],

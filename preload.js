@@ -19,12 +19,12 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Puente seguro entre el proceso principal y la interfaz.
+// Secure bridge between the main process and the UI.
 const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('drawnie', {
   platform: process.platform,
-  // Catálogo de traducciones del idioma activo (se pide de forma síncrona al arrancar).
+  // Translation catalog for the active language (requested synchronously at startup).
   i18n: ipcRenderer.sendSync('i18n:catalog'),
   onLocaleChange: (handler) => ipcRenderer.on('i18n:changed', (_e, catalog) => handler(catalog)),
   save: (content, { saveAs = false, suggestedName } = {}) =>

@@ -19,10 +19,10 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Colores y medidas predefinidas. Pocas opciones, todas armoniosas.
+// Predefined colors and sizes. Few options, all of them harmonious.
 import { N_ } from './i18n-core.js';
 
-/** Estilos de forma: relleno, borde y color de texto que combinan entre sí. */
+/** Shape styles: fill, border and text color that go well together. */
 export const PRESETS = {
   white: { fill: '#ffffff', stroke: '#c9d0da', text: '#1f2328' },
   gray: { fill: '#eef0f3', stroke: '#8a94a6', text: '#1f2328' },
@@ -56,7 +56,7 @@ export const FONT_SIZES = [
 ];
 
 export const SHAPE_KINDS = ['rect', 'pill', 'ellipse', 'diamond', 'triangle', 'hexagon', 'cylinder'];
-/** Nombres visibles (msgid en inglés; se traducen al pintar con t()). */
+/** Display names (English msgids; translated with t() when rendering). */
 export const SHAPE_LABELS = {
   rect: N_('Rectangle'),
   pill: N_('Pill'),
@@ -92,7 +92,7 @@ export const DEFAULT_SIZES = {
   sticky: [200, 200],
 };
 
-/** Convierte 'auto' en el color de primer plano del tema actual. */
+/** Turns 'auto' into the foreground color of the current theme. */
 export function resolveColor(color, theme) {
   return color === 'auto' ? theme.fg : color;
 }

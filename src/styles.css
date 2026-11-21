@@ -79,7 +79,7 @@ button {
 }
 button:disabled { opacity: 0.35; }
 
-/* ---------- Barra de título / herramientas ---------- */
+/* ---------- Title bar / toolbar ---------- */
 #titlebar {
   position: fixed;
   inset: 0 0 auto 0;
@@ -143,7 +143,7 @@ button:disabled { opacity: 0.35; }
 }
 #zoom-label:hover { background: var(--hover); color: var(--text); }
 
-/* ---------- Sub-barra de opciones ---------- */
+/* ---------- Options sub-bar ---------- */
 #subbar {
   position: fixed;
   top: calc(var(--titlebar-h) + 10px);
@@ -165,7 +165,7 @@ button:disabled { opacity: 0.35; }
 }
 #subbar.visible { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
 
-/* ---------- Lienzo ---------- */
+/* ---------- Canvas ---------- */
 #stage {
   position: fixed;
   inset: var(--titlebar-h) 0 0 0;
@@ -192,7 +192,7 @@ button:disabled { opacity: 0.35; }
 #stage[data-tool='text'] #canvas { cursor: text; }
 #stage[data-tool='eraser'] #canvas { cursor: none; }
 
-/* Superposición de selección */
+/* Selection overlay */
 .sel-outline { fill: none; stroke: var(--accent); stroke-width: 1.5; pointer-events: none; }
 .hover-outline { fill: none; stroke: var(--accent); stroke-width: 1.5; opacity: 0.45; pointer-events: none; }
 .target-outline { fill: rgba(0, 122, 255, 0.06); stroke: var(--accent); stroke-width: 2.5; pointer-events: none; }
@@ -211,7 +211,7 @@ button:disabled { opacity: 0.35; }
 .quick circle { fill: var(--accent); }
 .quick path { stroke: #fff; stroke-width: 1.75; stroke-linecap: round; }
 
-/* ---------- Editor de texto ---------- */
+/* ---------- Text editor ---------- */
 #editor-layer { position: absolute; inset: 0; pointer-events: none; }
 .editor-wrap {
   position: absolute;
@@ -324,7 +324,7 @@ button:disabled { opacity: 0.35; }
 .chip.small { height: 26px; padding: 0 9px; font-size: 12px; }
 .chip.active { background: var(--active); color: var(--accent-text); }
 
-/* ---------- Estado vacío y avisos ---------- */
+/* ---------- Empty state and toasts ---------- */
 #empty-hint {
   position: absolute;
   left: 50%;

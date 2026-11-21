@@ -19,8 +19,8 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Genera build/icon.png (1024×1024) a partir de build/icon.svg usando Electron.
-// Uso: npm run icon
+// Renders build/icon.png (1024×1024) from build/icon.svg using Electron.
+// Usage: npm run icon
 const { app, BrowserWindow } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');

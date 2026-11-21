@@ -19,7 +19,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Medición y ajuste de texto para que SVG y el editor coincidan.
+// Text measuring and wrapping so that SVG and the editor match.
 
 export const FONT_FAMILY = "-apple-system, BlinkMacSystemFont, 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif";
 export const LINE_HEIGHT = 1.3;
@@ -43,7 +43,7 @@ export function measure(text, size, bold = false) {
   return w;
 }
 
-/** Divide el texto en líneas que caben en maxWidth (respeta saltos manuales). */
+/** Splits the text into lines that fit in maxWidth (keeps manual line breaks). */
 export function wrapText(text, maxWidth, size, bold = false) {
   const out = [];
   for (const paragraph of String(text ?? '').split('\n')) {
@@ -57,7 +57,7 @@ export function wrapText(text, maxWidth, size, bold = false) {
       const candidate = line + word;
       if (measure(candidate, size, bold) <= maxWidth || line === '') {
         if (measure(candidate, size, bold) > maxWidth && line === '') {
-          // Palabra más larga que la caja: se corta por caracteres.
+          // Word longer than the box: break it by characters.
           let chunk = '';
           for (const ch of word) {
             if (measure(chunk + ch, size, bold) > maxWidth && chunk) {
@@ -77,7 +77,7 @@ export function wrapText(text, maxWidth, size, bold = false) {
   return out;
 }
 
-/** Recalcula ancho/alto de un elemento de texto libre. */
+/** Recomputes the width/height of a free text element. */
 export function fitText(el) {
   const lh = el.fontSize * LINE_HEIGHT;
   if (el.autoWidth) {

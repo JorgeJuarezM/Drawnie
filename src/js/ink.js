@@ -19,11 +19,11 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Trazos a mano alzada con grosor variable según la presión del lápiz.
+// Freehand strokes whose width follows the pen pressure.
 
 const f = (n) => Math.round(n * 100) / 100;
 
-/** Radio del trazo para una presión dada (0..1). */
+/** Stroke radius for a given pressure (0..1). */
 export function radiusFor(size, pressure) {
   const p = Math.min(1, Math.max(0, pressure));
   return (size / 2) * (0.35 + 1.3 * p);
@@ -58,13 +58,13 @@ function dot(x, y, r) {
   return `M${f(x - r)} ${f(y)} a${f(r)} ${f(r)} 0 1 0 ${f(r * 2)} 0 a${f(r)} ${f(r)} 0 1 0 ${f(-r * 2)} 0Z`;
 }
 
-/** Contorno relleno del trazo (estilo pluma). points: [[x, y, presión], …]. */
+/** Filled outline of the stroke (pen style). points: [[x, y, pressure], …]. */
 export function inkOutline(rawPoints, size) {
   const pts = dedupe(rawPoints.map((p) => [p[0], p[1], p[2] ?? 0.5]));
   if (!pts.length) return '';
   if (pts.length === 1) return dot(pts[0][0], pts[0][1], radiusFor(size, pts[0][2]));
 
-  // Radios suavizados para evitar saltos bruscos de grosor.
+  // Smoothed radii to avoid abrupt width jumps.
   const radii = [];
   let r = radiusFor(size, pts[0][2]);
   for (const p of pts) {
@@ -96,7 +96,7 @@ export function inkOutline(rawPoints, size) {
   return d;
 }
 
-/** Línea central suavizada (para el resaltador y el área de clic). */
+/** Smoothed centerline (for the highlighter and the hit area). */
 export function inkCenterline(rawPoints) {
   const pts = dedupe(rawPoints.map((p) => [p[0], p[1], p[2] ?? 0.5]));
   if (!pts.length) return '';

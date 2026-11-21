@@ -1,4 +1,4 @@
-# Traducción de Drawnie al español.
+# Drawnie Spanish translation.
 msgid ""
 msgstr ""
 "Project-Id-Version: Drawnie 0.1.0\n"

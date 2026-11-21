@@ -37,14 +37,3 @@ section 7 of the GNU Affero General Public License:
 3. Marking of modified versions (section 7(c)). Modified versions must
    be marked in reasonable ways as different from the original version
    and must not be presented as the original Drawnie.
-
-
-Resumen en español (informativo; el texto que rige es el de arriba y LICENSE):
-- Drawnie es software libre bajo la licencia GNU AGPL-3.0 o posterior.
-- Cualquier versión modificada o derivada debe publicarse con la misma
-  licencia y con su código fuente disponible, también si se ofrece como
-  servicio en red.
-- Se debe conservar el aviso de autoría de Jorge Juarez en el código, en
-  la documentación y en la pantalla "Acerca de" de la aplicación.
-- Las versiones modificadas deben indicarlo y no presentarse como el
-  Drawnie original.

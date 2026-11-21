@@ -19,7 +19,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-// Iconos de línea (24×24) dibujados con currentColor.
+// Line icons (24×24) drawn with currentColor.
 const s = (inner) =>
   `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
 
@@ -57,7 +57,7 @@ export const ICONS = {
   sun: s('<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>'),
   moon: s('<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'),
   pencilTip: s('<path d="M4 20l1.2-4.2L16.3 4.7a2.1 2.1 0 0 1 3 3L8.2 18.8z"/><path d="M14 20h6"/>'),
-  // Formas
+  // Shapes
   rect: s('<rect x="3.5" y="6" width="17" height="12" rx="2.5"/>'),
   pill: s('<rect x="3" y="7.5" width="18" height="9" rx="4.5"/>'),
   ellipse: s('<ellipse cx="12" cy="12" rx="8.5" ry="7.5"/>'),
