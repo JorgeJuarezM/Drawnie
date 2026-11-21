@@ -9,6 +9,14 @@
     "email": "contacto@jorgejuarez.net"
   },
   "license": "AGPL-3.0-or-later",
+  "homepage": "https://drawnie.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JorgeJuarezM/Drawnie.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JorgeJuarezM/Drawnie/issues"
+  },
   "private": true,
   "scripts": {
     "start": "electron .",
