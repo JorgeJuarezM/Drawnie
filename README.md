@@ -2,6 +2,8 @@
 
 An infinite whiteboard for simple, beautiful diagrams, inspired by macOS Freeform. Built with Electron and no frameworks: the canvas is plain SVG.
 
+**[Website](https://jorgejuarezm.github.io/Drawnie/)** · **[Download](https://github.com/JorgeJuarezM/Drawnie/releases/latest)**
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/board-dark.png">
   <img alt="A product launch flowchart in Drawnie with shapes, connectors, sticky notes and pen annotations" src="docs/screenshots/board-light.png">
@@ -90,6 +92,18 @@ The [`.github/workflows/build.yml`](.github/workflows/build.yml) workflow:
 - **Manual build**: *Actions → Build → Run workflow* builds the installers without publishing anything; they can be downloaded as artifacts for 14 days.
 
 The installers are currently unsigned. To sign them, add the certificates as repository *secrets* (`CSC_LINK`, `CSC_KEY_PASSWORD` and, for macOS, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`), pass them as environment variables to the "Build installers" step and remove `CSC_IDENTITY_AUTO_DISCOVERY`.
+
+### Website
+
+The website lives in [`site/`](site/) (plain HTML, CSS and JavaScript, styled like the app). The [`.github/workflows/pages.yml`](.github/workflows/pages.yml) workflow publishes it to GitHub Pages whenever `site/`, the screenshots or the icon change on `main`, copying `build/icon.png` and `docs/screenshots/` into it. Download links are read from the latest GitHub Release, so the page never needs updating for a new version.
+
+To preview it locally:
+
+```bash
+mkdir -p /tmp/drawnie-site && cp -R site/. /tmp/drawnie-site/ && mkdir -p /tmp/drawnie-site/assets \
+  && cp build/icon.png docs/screenshots/*.png /tmp/drawnie-site/assets/ \
+  && python3 -m http.server 8000 --directory /tmp/drawnie-site
+```
 
 ## Translations
 
