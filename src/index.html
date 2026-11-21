@@ -1,0 +1,85 @@
+<!doctype html>
+<!--
+  Drawnie - a whiteboard for simple, beautiful diagrams.
+  Copyright (C) 2026 Jorge Juarez <contacto@jorgejuarez.net>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published
+  by the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+  Additional attribution terms apply; see the NOTICE file.
+
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Drawnie</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header id="titlebar">
+    <div class="doc">
+      <div class="history-btns">
+        <button id="btn-undo" class="icon-btn" title="Deshacer"></button>
+        <button id="btn-redo" class="icon-btn" title="Rehacer"></button>
+      </div>
+      <div class="doc-name">
+        <span id="doc-title">Sin título</span>
+        <span id="doc-status"></span>
+      </div>
+    </div>
+    <nav id="toolbar" aria-label="Herramientas"></nav>
+    <div class="zoom">
+      <button id="zoom-out" class="icon-btn" title="Alejar"></button>
+      <button id="zoom-label" title="Clic: 100% / Ajustar">100%</button>
+      <button id="zoom-in" class="icon-btn" title="Acercar"></button>
+      <span class="sep"></span>
+      <button id="theme-toggle" class="icon-btn" title="Cambiar a modo oscuro"></button>
+    </div>
+  </header>
+
+  <div id="subbar"></div>
+
+  <main id="stage" class="grid">
+    <svg id="canvas" xmlns="http://www.w3.org/2000/svg">
+      <defs id="defs"></defs>
+      <g id="world">
+        <g id="content"></g>
+        <g id="live"></g>
+      </g>
+      <g id="overlay"></g>
+    </svg>
+    <div id="editor-layer"></div>
+    <div id="empty-hint">
+      <h2>Tu pizarra está lista</h2>
+      <p>Elige una forma, escribe con doble clic o dibuja con tu lápiz.</p>
+      <div class="keys">
+        <span><kbd>R</kbd> Formas</span>
+        <span><kbd>S</kbd> Nota</span>
+        <span><kbd>T</kbd> Texto</span>
+        <span><kbd>A</kbd> Conector</span>
+        <span><kbd>P</kbd> Pluma</span>
+        <span><kbd>Espacio</kbd> Mover</span>
+      </div>
+    </div>
+  </main>
+
+  <aside id="inspector" aria-label="Propiedades"></aside>
+  <div id="toast" role="status"></div>
+  <input id="file-input" type="file" accept="image/*" multiple hidden />
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

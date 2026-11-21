@@ -1,0 +1,50 @@
+Drawnie
+Copyright (C) 2026 Jorge Juarez <contacto@jorgejuarez.net>
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program, in the file LICENSE. If not, see
+<https://www.gnu.org/licenses/>.
+
+
+ADDITIONAL TERMS (section 7 of the GNU AGPL-3.0)
+================================================
+
+The following additional terms apply to this program and to any
+modified version of it or any work based on it, as permitted by
+section 7 of the GNU Affero General Public License:
+
+1. Author attribution (section 7(b)). The copyright notice above,
+   including the author's name "Jorge Juarez", must be preserved in the
+   source code, in this NOTICE file and in the documentation of any copy
+   or modified version.
+
+2. Attribution in the user interface (section 7(b)). Any version with an
+   interactive user interface must keep a visible notice crediting the
+   original author in its "About" screen, or in the equivalent place
+   where it displays its legal notices, for example:
+   "Based on Drawnie by Jorge Juarez".
+
+3. Marking of modified versions (section 7(c)). Modified versions must
+   be marked in reasonable ways as different from the original version
+   and must not be presented as the original Drawnie.
+
+
+Resumen en español (informativo; el texto que rige es el de arriba y LICENSE):
+- Drawnie es software libre bajo la licencia GNU AGPL-3.0 o posterior.
+- Cualquier versión modificada o derivada debe publicarse con la misma
+  licencia y con su código fuente disponible, también si se ofrece como
+  servicio en red.
+- Se debe conservar el aviso de autoría de Jorge Juarez en el código, en
+  la documentación y en la pantalla "Acerca de" de la aplicación.
+- Las versiones modificadas deben indicarlo y no presentarse como el
+  Drawnie original.

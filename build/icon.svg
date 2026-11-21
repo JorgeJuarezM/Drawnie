@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff8ee"/>
+      <stop offset="1" stop-color="#f7e2c8"/>
+    </linearGradient>
+    <linearGradient id="top" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8b5530"/>
+      <stop offset="1" stop-color="#5e3219"/>
+    </linearGradient>
+    <linearGradient id="side" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a2512"/>
+      <stop offset="1" stop-color="#36190b"/>
+    </linearGradient>
+    <linearGradient id="pencil" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3f8cff"/>
+      <stop offset="0.5" stop-color="#6aa8ff"/>
+      <stop offset="1" stop-color="#2f74e0"/>
+    </linearGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#5a2e12" flood-opacity="0.28"/>
+    </filter>
+    <filter id="sh-sm" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#2a1206" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Fondo -->
+  <rect x="100" y="100" width="824" height="824" rx="190" fill="url(#bg)"/>
+
+  <!-- Brownie: cara lateral y cara superior -->
+  <g filter="url(#sh)">
+    <rect x="218" y="330" width="588" height="430" rx="64" fill="url(#side)"/>
+    <rect x="218" y="276" width="588" height="420" rx="64" fill="url(#top)"/>
+  </g>
+  <!-- Costra brillante del brownie -->
+  <g fill="none" stroke="#a56a3e" stroke-linecap="round" stroke-width="10" opacity="0.55">
+    <path d="M290 340 q40 -18 84 0"/>
+    <path d="M640 330 q50 -16 100 6"/>
+    <path d="M270 620 q46 18 96 -2"/>
+    <path d="M690 640 q36 -20 78 -4"/>
+  </g>
+
+  <!-- Trazo de glaseado dibujado con lápiz -->
+  <path d="M300 540 C 350 380, 440 380, 455 480 S 540 640, 600 520 S 660 380, 700 440"
+        fill="none" stroke="#3b1c0c" stroke-opacity="0.35" stroke-width="58" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 10)"/>
+  <path d="M300 540 C 350 380, 440 380, 455 480 S 540 640, 600 520 S 660 380, 700 440"
+        fill="none" stroke="#fffaf2" stroke-width="54" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Lápiz: la punta toca el final del trazo -->
+  <g transform="translate(700 440) rotate(-38)" filter="url(#sh-sm)">
+    <path d="M0 0 L 40 -24 L 40 24 Z" fill="#f5d3a8"/>
+    <path d="M0 0 L 15 -9 L 15 9 Z" fill="#2b2b2b"/>
+    <rect x="40" y="-24" width="160" height="48" fill="url(#pencil)"/>
+    <rect x="200" y="-24" width="26" height="48" fill="#c9ced6"/>
+    <rect x="224" y="-24" width="40" height="48" rx="14" fill="#ff8fa8"/>
+  </g>
+</svg>
