@@ -36,7 +36,30 @@ npm run dist:win   # instalador NSIS para x64 y arm64
 npm run dist       # ambos
 ```
 
-Los paquetes quedan en `dist/`.
+Los paquetes quedan en `dist/`:
+
+```
+Drawnie-<versión>-mac-arm64.dmg / .zip   macOS Apple Silicon
+Drawnie-<versión>-mac-x64.dmg / .zip     macOS Intel
+Drawnie-Setup-<versión>.exe              Windows (x64 y arm64)
+```
+
+### Compilación automática (GitHub Actions)
+
+El workflow [`.github/workflows/build.yml`](.github/workflows/build.yml):
+
+- En cada push a `main` y en cada pull request ejecuta las pruebas y comprueba que las traducciones estén completas.
+- Para **publicar una versión**: sube la versión en `package.json`, haz commit y crea el tag correspondiente:
+
+  ```bash
+  npm version 0.2.0 -m "Versión %s"   # actualiza package.json, hace commit y crea el tag v0.2.0
+  git push --follow-tags
+  ```
+
+  El workflow genera los instaladores en macOS y Windows y crea la *Release* en GitHub con todos ellos adjuntos. Si el tag no coincide con la versión de `package.json`, se detiene.
+- **Compilación manual**: en *Actions → Build → Run workflow* se generan los instaladores sin publicar nada; se descargan como artefactos durante 14 días.
+
+Por ahora los instaladores se generan sin firmar. Para firmarlos hay que añadir los certificados como *secrets* del repositorio (`CSC_LINK`, `CSC_KEY_PASSWORD` y, en macOS, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`), pasarlos como variables de entorno en el paso "Generar instaladores" y quitar `CSC_IDENTITY_AUTO_DISCOVERY`.
 
 - **Icono**: se genera desde `build/icon.svg` con `npm run icon`, que escribe `build/icon.png`. electron-builder crea a partir de él el `.icns` y el `.ico`.
 - **Firma en macOS**: sin certificado, la app no queda firmada y Gatekeeper la bloquea la primera vez (clic derecho → Abrir). Para distribuirla, define `CSC_LINK` / `CSC_KEY_PASSWORD` y configura la notarización (`APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`).

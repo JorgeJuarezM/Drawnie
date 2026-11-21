@@ -1,0 +1,132 @@
+# Drawnie - a whiteboard for simple, beautiful diagrams.
+# Copyright (C) 2026 Jorge Juarez <contacto@jorgejuarez.net>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Pruebas en cada cambio; instaladores para macOS y Windows al publicar una versión.
+#
+#   - push / pull request       → pruebas
+#   - tag v*  (p. ej. v0.2.0)   → pruebas + instaladores + Release en GitHub
+#   - manual (Actions → Run)    → pruebas + instaladores como artefactos descargables
+
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+jobs:
+  test:
+    name: Pruebas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+
+      - name: Pruebas
+        run: npm test
+
+      - name: Traducciones completas
+        run: npm run i18n:check
+
+      - name: Sintaxis
+        run: |
+          node --check main.js
+          node --check preload.js
+          node --check i18n.js
+
+      - name: Versión del tag = versión de package.json
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          PKG="v$(node -p "require('./package.json').version")"
+          if [ "$PKG" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::El tag $GITHUB_REF_NAME no coincide con la versión de package.json ($PKG)"
+            exit 1
+          fi
+
+  build:
+    name: Instaladores (${{ matrix.name }})
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS
+            os: macos-latest
+            script: dist:mac
+            files: |
+              dist/*.dmg
+              dist/*.zip
+          - name: Windows
+            os: windows-latest
+            script: dist:win
+            files: |
+              dist/*.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Generar instaladores
+        shell: bash
+        run: npm run ${{ matrix.script }} -- --publish never
+        env:
+          # Sin certificados todavía: se generan sin firmar.
+          # Para firmar, añade los secretos y quita esta línea (ver README).
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: drawnie-${{ matrix.name }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    name: Publicar Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Crear Release con los instaladores
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -lh artifacts
+          gh release create "$GITHUB_REF_NAME" artifacts/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Drawnie $GITHUB_REF_NAME" \
+            --generate-notes
